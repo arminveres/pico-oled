@@ -1,2 +1,5 @@
-# pico-oled
-Refactored CPP driver for Waveshare Pico OLED 1.3
+[link](https://www.waveshare.com/wiki/Pico-OLED-1.3)
+
+# TODO
+
+- Clean up this library, and convert to cpp
