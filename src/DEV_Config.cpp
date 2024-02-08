@@ -27,6 +27,7 @@
 # THE SOFTWARE.
 ******************************************************************************/
 #include "DEV_Config.hpp"
+#include "types.hpp"
 
 #define SPI_PORT spi1
 #define I2C_PORT spi1
@@ -47,9 +48,9 @@ uint slice_num;
 /**
  * GPIO read and write
  **/
-void DEV_Digital_Write(UWORD Pin, UBYTE Value) { gpio_put(Pin, Value); }
+void DEV_Digital_Write(u16 Pin, u8 Value) { gpio_put(Pin, Value); }
 
-UBYTE DEV_Digital_Read(UWORD Pin) { return gpio_get(Pin); }
+u8 DEV_Digital_Read(u16 Pin) { return gpio_get(Pin); }
 
 /**
  * SPI
@@ -85,7 +86,7 @@ uint8_t DEV_I2C_ReadByte(uint8_t addr, uint8_t reg) {
 /**
  * GPIO Mode
  **/
-void DEV_GPIO_Mode(UWORD Pin, UWORD Mode) {
+void DEV_GPIO_Mode(u16 Pin, u16 Mode) {
   gpio_init(Pin);
   if (Mode == 0 || Mode == GPIO_IN) {
     gpio_set_dir(Pin, GPIO_IN);
@@ -97,7 +98,7 @@ void DEV_GPIO_Mode(UWORD Pin, UWORD Mode) {
 /**
  * KEY Config
  **/
-void DEV_KEY_Config(UWORD Pin) {
+void DEV_KEY_Config(u16 Pin) {
   gpio_init(Pin);
   gpio_pull_up(Pin);
   gpio_set_dir(Pin, GPIO_IN);
@@ -106,9 +107,9 @@ void DEV_KEY_Config(UWORD Pin) {
 /**
  * delay x ms
  **/
-void DEV_Delay_ms(UDOUBLE xms) { sleep_ms(xms); }
+void DEV_Delay_ms(u32 xms) { sleep_ms(xms); }
 
-void DEV_Delay_us(UDOUBLE xus) { sleep_us(xus); }
+void DEV_Delay_us(u32 xus) { sleep_us(xus); }
 
 void DEV_GPIO_Init(void) {
   DEV_GPIO_Mode(EPD_RST_PIN, 1);
@@ -127,7 +128,7 @@ void DEV_GPIO_Init(void) {
 function:	Module Initialize, the library and initialize the pins, SPI
 protocol parameter: Info:
 ******************************************************************************/
-UBYTE DEV_Module_Init(void) {
+u8 DEV_Module_Init(void) {
   stdio_init_all();
 
   // GPIO PIN

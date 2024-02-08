@@ -92,29 +92,29 @@ enum class eDrawFilling {
  * Custom structure of a time attribute
  **/
 struct PaintTime {
-  UWORD Year;  // 0000
-  UBYTE Month; // 1 - 12
-  UBYTE Day;   // 1 - 30
-  UBYTE Hour;  // 0 - 23
-  UBYTE Min;   // 0 - 59
-  UBYTE Sec;   // 0 - 59
+  u16 Year;  // 0000
+  u8 Month; // 1 - 12
+  u8 Day;   // 1 - 30
+  u8 Hour;  // 0 - 23
+  u8 Min;   // 0 - 59
+  u8 Sec;   // 0 - 59
 };
 
 /**
  * Image attributes
  **/
 struct Paint {
-  UBYTE *Image;
-  UWORD Width;
-  UWORD Height;
-  UWORD WidthMemory;
-  UWORD HeightMemory;
-  UWORD Color;
+  u8 *Image;
+  u16 Width;
+  u16 Height;
+  u16 WidthMemory;
+  u16 HeightMemory;
+  u16 Color;
   eRotation m_rotation;
-  UWORD Mirror;
-  UWORD WidthByte;
-  UWORD HeightByte;
-  UWORD Scale;
+  u16 Mirror;
+  u16 WidthByte;
+  u16 HeightByte;
+  u16 Scale;
 
   /// Init and create new image
   ///
@@ -123,10 +123,10 @@ struct Paint {
   ///     width   :   The width of the picture
   ///     Height  :   The height of the picture
   ///     Color   :   Whether the picture is inverted
-  auto create_image(UBYTE *image, UWORD Width, UWORD Height, eRotation rotation,
-                    UWORD Color);
+  auto create_image(u8 *image, u16 Width, u16 Height, eRotation rotation,
+                    u16 Color);
   /// Select Image
-  auto select_image(UBYTE *image);
+  auto select_image(u8 *image);
 
   auto set_rotation(const eRotation rotation);
 
@@ -135,43 +135,43 @@ function:	Select Image mirror
 parameter:
     mirror   :Not mirror,Horizontal mirror,Vertical mirror,Origin mirror
 ******************************************************************************/
-  auto SetMirroring(UBYTE mirror);
-  auto SetPixel(UWORD Xpoint, UWORD Ypoint, UWORD Color);
-  auto SetScale(UBYTE scale);
+  auto SetMirroring(u8 mirror);
+  auto SetPixel(u16 Xpoint, u16 Ypoint, u16 Color);
+  auto SetScale(u8 scale);
 
-  auto Clear(UWORD Color);
-  auto ClearWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,
-                    UWORD Color);
+  auto Clear(u16 Color);
+  auto ClearWindows(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend,
+                    u16 Color);
 
   // Dr
-  auto DrawPoint(UWORD Xpoint, UWORD Ypoint, UWORD Color, eDotSize Dot_Pixel,
+  auto DrawPoint(u16 Xpoint, u16 Ypoint, u16 Color, eDotSize Dot_Pixel,
                  eDotStyle Dot_FillWay);
-  auto DrawLine(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend, UWORD Color,
+  auto DrawLine(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, u16 Color,
                 eDotSize Line_width, eLineStyle Line_Style);
-  auto DrawRectangle(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,
-                     UWORD Color, eDotSize Line_width, eDrawFilling Draw_Fill);
-  auto DrawCircle(UWORD X_Center, UWORD Y_Center, UWORD Radius, UWORD Color,
+  auto DrawRectangle(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend,
+                     u16 Color, eDotSize Line_width, eDrawFilling Draw_Fill);
+  auto DrawCircle(u16 X_Center, u16 Y_Center, u16 Radius, u16 Color,
                   eDotSize Line_width, eDrawFilling Draw_Fill);
 
   // Distring
-  auto DrawChar(UWORD Xstart, UWORD Ystart, const char Acsii_Char, sFONT *Font,
-                UWORD Color_Foreground, UWORD Color_Background);
-  auto DrawString_EN(UWORD Xstart, UWORD Ystart, const char *pString,
-                     sFONT *Font, UWORD Color_Foreground,
-                     UWORD Color_Background);
-  auto DrawNum(UWORD Xpoint, UWORD Ypoint, double Nummber, sFONT *Font,
-               UWORD Digit, UWORD Color_Foreground, UWORD Color_Background);
-  auto DrawTime(UWORD Xstart, UWORD Ystart, PaintTime *pTime, sFONT *Font,
-                UWORD Color_Foreground, UWORD Color_Background);
+  auto DrawChar(u16 Xstart, u16 Ystart, const char Acsii_Char, sFONT *Font,
+                u16 Color_Foreground, u16 Color_Background);
+  auto DrawString_EN(u16 Xstart, u16 Ystart, const char *pString,
+                     sFONT *Font, u16 Color_Foreground,
+                     u16 Color_Background);
+  auto DrawNum(u16 Xpoint, u16 Ypoint, double Nummber, sFONT *Font,
+               u16 Digit, u16 Color_Foreground, u16 Color_Background);
+  auto DrawTime(u16 Xstart, u16 Ystart, PaintTime *pTime, sFONT *Font,
+                u16 Color_Foreground, u16 Color_Background);
 
   // pi
   auto DrawBitMap(const unsigned char *image_buffer);
-  auto DrawBitMap_Block(const unsigned char *image_buffer, UBYTE Region);
+  auto DrawBitMap_Block(const unsigned char *image_buffer, u8 Region);
 
-  auto DrawImage(const unsigned char *image, UWORD xStart, UWORD yStart,
-                 UWORD W_Image, UWORD H_Image);
-  auto DrawImage1(const unsigned char *image, UWORD xStart, UWORD yStart,
-                  UWORD W_Image, UWORD H_Image);
+  auto DrawImage(const unsigned char *image, u16 xStart, u16 yStart,
+                 u16 W_Image, u16 H_Image);
+  auto DrawImage1(const unsigned char *image, u16 xStart, u16 yStart,
+                  u16 W_Image, u16 H_Image);
   auto BmpWindows(unsigned char x, unsigned char y, const unsigned char *pBmp,
                   unsigned char chWidth, unsigned char chHeight);
 };

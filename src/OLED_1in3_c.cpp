@@ -28,8 +28,9 @@
 # THE SOFTWARE.
 ******************************************************************************/
 #include "OLED_1in3_c.hpp"
+#include "types.hpp"
 
-#include "stdio.h"
+#include <cstdio>
 
 /*******************************************************************************
 function:
@@ -138,16 +139,16 @@ function:
                         Clear screen
 ********************************************************************************/
 void OLED_1in3_C_Clear() {
-  UWORD Width, Height, column;
+  u16 Width, Height, column;
   Width = (OLED_1in3_C_WIDTH % 8 == 0) ? (OLED_1in3_C_WIDTH / 8)
                                        : (OLED_1in3_C_WIDTH / 8 + 1);
   Height = OLED_1in3_C_HEIGHT;
   OLED_WriteReg(0xb0); // Set the row  start address
-  for (UWORD j = 0; j < Height; j++) {
+  for (u16 j = 0; j < Height; j++) {
     column = 63 - j;
     OLED_WriteReg(0x00 + (column & 0x0f)); // Set column low start address
     OLED_WriteReg(0x10 + (column >> 4));   // Set column higt start address
-    for (UWORD i = 0; i < Width; i++) {
+    for (u16 i = 0; i < Width; i++) {
       OLED_WriteData(0x00);
     }
   }
@@ -157,7 +158,7 @@ void OLED_1in3_C_Clear() {
 function:
             reverse a byte data
 ********************************************************************************/
-static UBYTE reverse(UBYTE temp) {
+static u8 reverse(u8 temp) {
   temp = ((temp & 0x55) << 1) | ((temp & 0xaa) >> 1);
   temp = ((temp & 0x33) << 2) | ((temp & 0xcc) >> 2);
   temp = ((temp & 0x0f) << 4) | ((temp & 0xf0) >> 4);
@@ -168,17 +169,17 @@ static UBYTE reverse(UBYTE temp) {
 function:
                         Update all memory to OLED
 ********************************************************************************/
-void OLED_1in3_C_Display(const UBYTE *Image) {
-  UWORD Width, Height, column, temp;
+void OLED_1in3_C_Display(const u8 *Image) {
+  u16 Width, Height, column, temp;
   Width = (OLED_1in3_C_WIDTH % 8 == 0) ? (OLED_1in3_C_WIDTH / 8)
                                        : (OLED_1in3_C_WIDTH / 8 + 1);
   Height = OLED_1in3_C_HEIGHT;
   OLED_WriteReg(0xb0); // Set the row  start address
-  for (UWORD j = 0; j < Height; j++) {
+  for (u16 j = 0; j < Height; j++) {
     column = 63 - j;
     OLED_WriteReg(0x00 + (column & 0x0f)); // Set column low start address
     OLED_WriteReg(0x10 + (column >> 4));   // Set column higt start address
-    for (UWORD i = 0; i < Width; i++) {
+    for (u16 i = 0; i < Width; i++) {
       temp = Image[i + j * Width];
       // printf("0x%x \r\n",temp);
       temp = reverse(temp); // reverse the buffer

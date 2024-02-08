@@ -1,5 +1,7 @@
 #ifndef __TYPES_PICO_OLED_H_
 #define __TYPES_PICO_OLED_H_
+
+#include <cmath>
 #include <cstdint>
 
 using i8 = std::int8_t;

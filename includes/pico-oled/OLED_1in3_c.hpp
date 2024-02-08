@@ -31,6 +31,7 @@
 #define __OLED_1IN3_C_H
 
 #include "DEV_Config.hpp"
+#include "types.hpp"
 
 /********************************************************************************
 function:
@@ -62,7 +63,7 @@ extern "C" {
 
 void OLED_1in3_C_Init(void);
 void OLED_1in3_C_Clear(void);
-void OLED_1in3_C_Display(const UBYTE *Image);
+void OLED_1in3_C_Display(const u8 *Image);
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
