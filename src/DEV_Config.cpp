@@ -26,7 +26,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 ******************************************************************************/
-#include "DEV_Config.h"
+#include "DEV_Config.hpp"
 
 #define SPI_PORT spi1
 #define I2C_PORT spi1

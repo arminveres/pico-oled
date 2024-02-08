@@ -36,7 +36,7 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "fonts.h"
+#include "fonts.hpp"
 
 const uint8_t Font24_Table[] = {
     // @0 ' ' (17 pixels wide)

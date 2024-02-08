@@ -30,7 +30,7 @@
 #ifndef __OLED_1IN3_C_H
 #define __OLED_1IN3_C_H
 
-#include "DEV_Config.h"
+#include "DEV_Config.hpp"
 
 /********************************************************************************
 function:

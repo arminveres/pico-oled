@@ -1,69 +1,62 @@
-#include "GUI_Paint.h"
+#include "GUI_Paint.hpp"
 
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h> //memset()
 
-#include "DEV_Config.h"
-#include "Debug.h"
+#include "DEV_Config.hpp"
+#include "Debug.hpp"
 
-PAINT Paint;
+auto Paint::create_image(UBYTE *image, UWORD Width, UWORD Height,
+                         eRotation rotation, UWORD Color) {
+  this->Image = nullptr;
+  this->Image = image;
 
-/******************************************************************************
-function: Create Image
-parameter:
-    image   :   Pointer to the image cache
-    width   :   The width of the picture
-    Height  :   The height of the picture
-    Color   :   Whether the picture is inverted
-******************************************************************************/
-void Paint_NewImage(UBYTE *image, UWORD Width, UWORD Height, UWORD Rotate,
-                    UWORD Color) {
-  Paint.Image = NULL;
-  Paint.Image = image;
+  this->WidthMemory = Width;
+  this->HeightMemory = Height;
+  this->Color = Color;
+  this->Scale = 2;
 
-  Paint.WidthMemory = Width;
-  Paint.HeightMemory = Height;
-  Paint.Color = Color;
-  Paint.Scale = 2;
-
-  Paint.WidthByte = (Width % 8 == 0) ? (Width / 8) : (Width / 8 + 1);
-  Paint.HeightByte = Height;
+  this->WidthByte = (Width % 8 == 0) ? (Width / 8) : (Width / 8 + 1);
+  this->HeightByte = Height;
   //    printf("WidthByte = %d, HeightByte = %d\r\n", Paint.WidthByte,
   //    Paint.HeightByte); printf(" EPD_WIDTH / 8 = %d\r\n",  122 / 8);
 
-  Paint.Rotate = Rotate;
-  Paint.Mirror = MIRROR_NONE;
+  this->m_rotation = rotation;
+  this->Mirror = MIRROR_NONE;
 
-  if (Rotate == ROTATE_0 || Rotate == ROTATE_180) {
-    Paint.Width = Width;
-    Paint.Height = Height;
-  } else {
-    Paint.Width = Height;
-    Paint.Height = Width;
+  switch (this->m_rotation) {
+  case eRotation::eROTATE_0:
+  case eRotation::eROTATE_180: {
+    this->Width = Width;
+    this->Height = Height;
+  } break;
+
+  case eRotation::eROTATE_90:
+  case eRotation::eROTATE_270: {
+    this->Width = Height;
+    this->Height = Width;
+  } break;
+
   }
 }
 
-/******************************************************************************
-function: Select Image
-parameter:
-    image : Pointer to the image cache
-******************************************************************************/
-void Paint_SelectImage(UBYTE *image) { Paint.Image = image; }
+auto Paint::select_image(UBYTE *image) { this->Image = image; }
 
-/******************************************************************************
-function: Select Image Rotate
-parameter:
-    Rotate : 0,90,180,270
-******************************************************************************/
-void Paint_SetRotate(UWORD Rotate) {
-  if (Rotate == ROTATE_0 || Rotate == ROTATE_90 || Rotate == ROTATE_180 ||
-      Rotate == ROTATE_270) {
-    Debug("Set image Rotate %d\r\n", Rotate);
-    Paint.Rotate = Rotate;
+auto Paint::set_rotation(const eRotation rotation) {
+  this->m_rotation = rotation;
+}
+
+void Paint_SetMirroring(UBYTE mirror) {
+  if (mirror == MIRROR_NONE || mirror == MIRROR_HORIZONTAL ||
+      mirror == MIRROR_VERTICAL || mirror == MIRROR_ORIGIN) {
+    Debug("mirror image x:%s, y:%s\r\n", (mirror & 0x01) ? "mirror" : "none",
+          ((mirror >> 1) & 0x01) ? "mirror" : "none");
+    Paint.Mirror = mirror;
   } else {
-    Debug("rotate = 0, 90, 180, 270\r\n");
+    Debug("mirror should be MIRROR_NONE, MIRROR_HORIZONTAL, \
+        MIRROR_VERTICAL or MIRROR_ORIGIN\r\n");
   }
 }
 
@@ -89,22 +82,6 @@ void Paint_SetScale(UBYTE scale) {
   } else {
     Debug("Set Scale Input parameter error\r\n");
     Debug("Scale Only support: 2 4 16 65\r\n");
-  }
-}
-/******************************************************************************
-function:	Select Image mirror
-parameter:
-    mirror   :Not mirror,Horizontal mirror,Vertical mirror,Origin mirror
-******************************************************************************/
-void Paint_SetMirroring(UBYTE mirror) {
-  if (mirror == MIRROR_NONE || mirror == MIRROR_HORIZONTAL ||
-      mirror == MIRROR_VERTICAL || mirror == MIRROR_ORIGIN) {
-    Debug("mirror image x:%s, y:%s\r\n", (mirror & 0x01) ? "mirror" : "none",
-          ((mirror >> 1) & 0x01) ? "mirror" : "none");
-    Paint.Mirror = mirror;
-  } else {
-    Debug("mirror should be MIRROR_NONE, MIRROR_HORIZONTAL, \
-        MIRROR_VERTICAL or MIRROR_ORIGIN\r\n");
   }
 }
 

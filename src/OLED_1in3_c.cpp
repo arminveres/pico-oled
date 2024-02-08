@@ -27,7 +27,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 ******************************************************************************/
-#include "OLED_1in3_c.h"
+#include "OLED_1in3_c.hpp"
 
 #include "stdio.h"
 
