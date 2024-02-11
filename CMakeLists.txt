@@ -19,23 +19,29 @@ pico_sdk_init()
 
 include_directories(includes/pico-oled)
 
-add_library(pico-oled-main
-    src/OLED_1in3_c.cpp
+add_compile_options(
+    # -Werror
+    -Wall
+    -Wextra
+    -Wconversion
+    -Wpedantic
+    # note covered by above
+    -Wshadow
+    -Wundef
+    -Wdouble-promotion
+    -Os
+    -mtune=cortex-m0plus
+    -fno-common
+    -fstack-usage
+    -ffunction-sections
+    -fdata-sections
 )
 
-target_link_libraries(pico-oled-main PUBLIC
-    pico_stdlib
-    hardware_spi
-    hardware_i2c
-    hardware_pwm
-    hardware_adc
+add_library(pico-oled-paint
+    src/paint.cpp
 )
 
-add_library(pico-oled-gui
-    src/GUI_Paint.cpp
-)
-
-target_link_libraries(pico-oled-gui PUBLIC
+target_link_libraries(pico-oled-paint PUBLIC
     pico_stdlib
     hardware_spi
     hardware_i2c
@@ -51,11 +57,14 @@ add_library(pico-oled-fonts
     src/font8.cpp
 )
 
-add_library(pico-oled-config
-    src/DEV_Config.cpp
+add_executable(test
+    examples/test.cpp
 )
 
-target_link_libraries(pico-oled-config PUBLIC
+target_link_libraries(test PUBLIC
+    pico-oled-fonts
+    pico-oled-paint
+
     pico_stdlib
     hardware_spi
     hardware_i2c
