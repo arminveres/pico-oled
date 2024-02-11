@@ -1,17 +1,17 @@
-#include "GUI_Paint.hpp"
+#include "paint.hpp"
 
 #include <array>
-#include <cmath>
 #include <cstdint>
-#include <cstdlib>
-#include <cstring>
 #include <limits>
 
-#include "DEV_Config.hpp"
 #include "Debug.hpp"
+#include "fonts.hpp"
+#include "paint_enums.hpp"
 #include "types.hpp"
 
-auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, u16 Color) {
+using namespace pico_oled::paint;
+
+auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color) {
     this->m_image_buf = nullptr;
     this->m_image_buf = image;
 
@@ -389,7 +389,7 @@ auto Paint::draw_circle(u16 X_Center, u16 Y_Center, u16 Radius, eImageColors Col
     }
 }
 
-auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, sFONT *Font,
+auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, const font::Font &Font,
                       eImageColors Color_Foreground, eImageColors Color_Background) {
     if (Xpoint > this->m_width || Ypoint > this->m_height) {
         Debug("Paint_DrawChar Input exceeds the normal display range\r\n");
@@ -397,11 +397,11 @@ auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, sFONT *Font
     }
 
     const u32 Char_Offset =
-        (Acsii_Char - ' ') * Font->Height * (Font->Width / 8 + (Font->Width % 8 ? 1 : 0));
-    const unsigned char *ptr = &Font->table[Char_Offset];
+        (Acsii_Char - ' ') * Font.Height * (Font.Width / 8 + (Font.Width % 8 ? 1 : 0));
+    const auto *ptr = &Font.table[Char_Offset];
 
-    for (u16 Page = 0; Page < Font->Height; Page++) {
-        for (u16 Column = 0; Column < Font->Width; Column++) {
+    for (u16 Page = 0; Page < Font.Height; Page++) {
+        for (u16 Column = 0; Column < Font.Width; Column++) {
             // To determine whether the font background color and screen background
             // color is consistent
             if (eImageColors::FONT_BACKGROUND ==
@@ -424,11 +424,11 @@ auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, sFONT *Font
             // One pixel is 8 bits
             if (Column % 8 == 7) ptr++;
         }  // Write a line
-        if (Font->Width % 8 != 0) ptr++;
+        if (Font.Width % 8 != 0) ptr++;
     }  // Write all
 }
 
-auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, sFONT *Font,
+auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, const font::Font &Font,
                            eImageColors Color_Foreground, eImageColors Color_Background) {
     u16 Xpoint = Xstart;
     u16 Ypoint = Ystart;
@@ -441,13 +441,13 @@ auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, sFONT *F
     while (*pString != '\0') {
         // if X direction filled , reposition to(Xstart,Ypoint),Ypoint is Y
         // direction plus the Height of the character
-        if ((Xpoint + Font->Width) > this->m_width) {
+        if ((Xpoint + Font.Width) > this->m_width) {
             Xpoint = Xstart;
-            Ypoint += Font->Height;
+            Ypoint += Font.Height;
         }
 
         // If the Y direction is full, reposition to(Xstart, Ystart)
-        if ((Ypoint + Font->Height) > this->m_height) {
+        if ((Ypoint + Font.Height) > this->m_height) {
             Xpoint = Xstart;
             Ypoint = Ystart;
         }
@@ -457,11 +457,11 @@ auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, sFONT *F
         pString++;
 
         // The next word of the abscissa increases the font of the broadband
-        Xpoint += Font->Width;
+        Xpoint += Font.Width;
     }
 }
 
-auto Paint::draw_number(u16 Xpoint, u16 Ypoint, double Nummber, sFONT *Font, u16 Digit,
+auto Paint::draw_number(u16 Xpoint, u16 Ypoint, double Nummber, const font::Font &Font, u16 Digit,
                         eImageColors Color_Foreground, eImageColors Color_Background) {
     i16 Num_Bit = 0;
     i16 Str_Bit = 0;
@@ -512,27 +512,27 @@ auto Paint::draw_number(u16 Xpoint, u16 Ypoint, double Nummber, sFONT *Font, u16
                          Color_Foreground);
 }
 
-auto Paint::draw_time(u16 Xstart, u16 Ystart, PaintTime *pTime, sFONT *Font,
+auto Paint::draw_time(u16 Xstart, u16 Ystart, const PaintTime &pTime, const font::Font &Font,
                       eImageColors Color_Foreground, eImageColors Color_Background) {
     constexpr char value[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    const auto Dx = Font->Width;
+    const auto Dx = Font.Width;
 
     // Write data into the cache
-    this->draw_char(Xstart, Ystart, value[pTime->Hour / 10], Font, Color_Background,
+    this->draw_char(Xstart, Ystart, value[pTime.Hour / 10], Font, Color_Background,
                     Color_Foreground);
-    this->draw_char(Xstart + Dx, Ystart, value[pTime->Hour % 10], Font, Color_Background,
+    this->draw_char(Xstart + Dx, Ystart, value[pTime.Hour % 10], Font, Color_Background,
                     Color_Foreground);
     this->draw_char(Xstart + Dx + Dx / 4 + Dx / 2, Ystart, ':', Font, Color_Background,
                     Color_Foreground);
-    this->draw_char(Xstart + Dx * 2 + Dx / 2, Ystart, value[pTime->Min / 10], Font,
+    this->draw_char(Xstart + Dx * 2 + Dx / 2, Ystart, value[pTime.Min / 10], Font,
                     Color_Background, Color_Foreground);
-    this->draw_char(Xstart + Dx * 3 + Dx / 2, Ystart, value[pTime->Min % 10], Font,
+    this->draw_char(Xstart + Dx * 3 + Dx / 2, Ystart, value[pTime.Min % 10], Font,
                     Color_Background, Color_Foreground);
     this->draw_char(Xstart + Dx * 4 + Dx / 2 - Dx / 4, Ystart, ':', Font, Color_Background,
                     Color_Foreground);
-    this->draw_char(Xstart + Dx * 5, Ystart, value[pTime->Sec / 10], Font, Color_Background,
+    this->draw_char(Xstart + Dx * 5, Ystart, value[pTime.Sec / 10], Font, Color_Background,
                     Color_Foreground);
-    this->draw_char(Xstart + Dx * 6, Ystart, value[pTime->Sec % 10], Font, Color_Background,
+    this->draw_char(Xstart + Dx * 6, Ystart, value[pTime.Sec % 10], Font, Color_Background,
                     Color_Foreground);
 }
 
