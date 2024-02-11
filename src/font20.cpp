@@ -2133,10 +2133,13 @@ static constexpr uint8_t Font20_Table[] = {
     0x00, 0x00,  //
 };
 
-pico_oled::font::Font Font20 = {
+
+namespace pico_oled::font {
+Font Font20 = {
     Font20_Table,
     14,
     20,
 };
+}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

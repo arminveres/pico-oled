@@ -994,10 +994,12 @@ static constexpr uint8_t _font_8_table[] = {
     0x00,  //
 };
 
-pico_oled::font::Font Font8 = {
+namespace pico_oled::font {
+Font Font8 = {
     _font_8_table,
     5,
     8,
 };
+}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,34 +1,40 @@
-static constexpr unsigned char Signal816[16] = //mobie signal
-{
+#ifndef __IMG_DATA_HPP
+#define __IMG_DATA_HPP
+#include "types.hpp"
+
+#include <array>
+
+/// mobile signal
+static constexpr std::array<u8, 16> Signal816 = {
 	0xFE,0x02,0x92,0x0A,0x54,0x2A,0x38,0xAA,0x12,0xAA,0x12,0xAA,0x12,0xAA,0x12,0xAA
 };
-static constexpr unsigned char Msg816[16] =  //message
+static constexpr std::array<u8, 16> Msg816 =  //message
 {
 	0x1F,0xF8,0x10,0x08,0x18,0x18,0x14,0x28,0x13,0xC8,0x10,0x08,0x10,0x08,0x1F,0xF8
 };
 
-static constexpr unsigned char Bat816[16] = //batery
+static constexpr std::array<u8, 16> Bat816 = //batery
 {
 	0x0F,0xFE,0x30,0x02,0x26,0xDA,0x26,0xDA,0x26,0xDA,0x26,0xDA,0x30,0x02,0x0F,0xFE
 };
 
-static constexpr unsigned char Bluetooth88[8] = // bluetooth
+static constexpr std::array<u8, 8> Bluetooth88 = // bluetooth
 {
 	0x18,0x54,0x32,0x1C,0x1C,0x32,0x54,0x18
 };
 
-static constexpr unsigned char GPRS88[8] = //GPRS
+static constexpr std::array<u8, 8> GPRS88 = //GPRS
 {
 	0xC3,0x99,0x24,0x20,0x2C,0x24,0x99,0xC3
 };
 
-static constexpr unsigned char Alarm88[8] = //alram
+static constexpr std::array<u8, 8> Alarm888 = //alram
 {
 	0xC3,0xBD,0x42,0x52,0x4E,0x42,0x3C,0xC3
 };
 
 
-static constexpr unsigned char gImage_1inch3_C_1[1024] = { /* 0X00,0X01,0X80,0X00,0X40,0X00, */
+static constexpr std::array<u8, 1024> gImage_1inch3_C_1= { /* 0X00,0X01,0X80,0X00,0X40,0X00, */
 0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
 0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
 0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
@@ -96,7 +102,7 @@ static constexpr unsigned char gImage_1inch3_C_1[1024] = { /* 0X00,0X01,0X80,0X0
 };
 
 
-static constexpr unsigned char gImage_1inch3_1[115200] = { /* 0X00,0X10,0XF0,0X00,0XF0,0X00,0X01,0X1B, */
+static constexpr std::array<u8, 115200> gImage_1inch3_1 = { /* 0X00,0X10,0XF0,0X00,0XF0,0X00,0X01,0X1B, */
 0XEF,0X83,0XAE,0X73,0X48,0X4A,0X03,0X21,0X44,0X29,0X84,0X31,0X64,0X29,0X85,0X31,
 0X85,0X31,0X85,0X31,0XA6,0X31,0XC6,0X39,0XA5,0X31,0X64,0X29,0X44,0X29,0X64,0X29,
 0X63,0X29,0X43,0X21,0X22,0X21,0X43,0X29,0X84,0X39,0X43,0X31,0X63,0X31,0XA3,0X39,
@@ -7298,3 +7304,4 @@ static constexpr unsigned char gImage_1inch3_1[115200] = { /* 0X00,0X10,0XF0,0X0
 0X26,0X4A,0X67,0X4A,0X68,0X52,0X8A,0X5A,0X0C,0X6B,0XCB,0X62,0XCA,0X62,0X89,0X52,
 0X27,0X4A,0XE6,0X41,0XC5,0X39,0X06,0X42,0X27,0X4A,0X48,0X52,0XEB,0X6A,0X8A,0X5A,
 };
+#endif

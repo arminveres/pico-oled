@@ -1752,10 +1752,12 @@ static constexpr uint8_t Font16_Table[] = {
     0x00, 0x00,  //
 };
 
-pico_oled::font::Font Font16 = {
+namespace pico_oled::font {
+Font Font16 = {
     Font16_Table,
     11,
     16,
 };
+}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -11,8 +11,9 @@
 
 using namespace pico_oled::paint;
 
-auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color) {
-    this->m_image_buf = nullptr;
+auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color)
+    -> void {
+    // this->m_image_buf = nullptr;
     this->m_image_buf = image;
 
     this->m_width_memory = Width;
@@ -43,17 +44,17 @@ auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, e
     }
 }
 
-auto Paint::select_image(u8 *image) { this->m_image_buf = image; }
+auto Paint::select_image(u8 *image) -> void { this->m_image_buf = image; }
 
-auto Paint::set_rotation(const eRotation rotation) { this->m_rotation = rotation; }
+auto Paint::set_rotation(const eRotation rotation) -> void { this->m_rotation = rotation; }
 
-auto Paint::set_mirror_orientation(eMirrorOrientiation mirror) {
+auto Paint::set_mirror_orientation(eMirrorOrientiation mirror) -> void {
     Debug("mirror image x:%s, y:%s\r\n", (mirror & 0x01) ? "mirror" : "none",
           ((mirror >> 1) & 0x01) ? "mirror" : "none");
     this->m_mirror = mirror;
 }
 
-auto Paint::set_scale(eScaling scale) {
+auto Paint::set_scale(eScaling scale) -> void {
     this->m_scale = scale;
 
     switch (scale) {
@@ -79,7 +80,7 @@ auto Paint::set_scale(eScaling scale) {
     }
 }
 
-auto Paint::draw_pixel(u16 Xpoint, u16 Ypoint, eImageColors Color) {
+auto Paint::draw_pixel(u16 Xpoint, u16 Ypoint, eImageColors Color) -> void {
     if (Xpoint > this->m_width || Ypoint > this->m_height) {
         Debug("Exceeding display boundaries\r\n");
         return;
@@ -162,7 +163,7 @@ auto Paint::draw_pixel(u16 Xpoint, u16 Ypoint, eImageColors Color) {
     }
 }
 
-auto Paint::clear_color(eImageColors Color) {
+auto Paint::clear_color(eImageColors Color) -> void {
     /// numeric version of enum
     auto num_color = static_cast<u32>(Color);
 
@@ -197,7 +198,7 @@ auto Paint::clear_color(eImageColors Color) {
     }
 }
 
-auto Paint::ClearWindows(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color) {
+auto Paint::ClearWindows(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color) -> void {
     for (u16 Y = Ystart; Y < Yend; Y++) {
         for (u16 X = Xstart; X < Xend; X++) {  // 8 pixel =  1 byte
             this->draw_pixel(X, Y, Color);
@@ -205,8 +206,8 @@ auto Paint::ClearWindows(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColor
     }
 }
 
-auto Paint::draw_point(u16 Xpoint, u16 Ypoint, eImageColors Color, eDotSize Dot_Pixel,
-                       eStyle dot_style) {
+auto Paint::draw_point(u16 Xpoint, u16 Ypoint, eImageColors color, eDotSize epxsize,
+                       eDotStyle dot_style) -> void {
     if (Xpoint > this->m_width || Ypoint > this->m_height) {
         Debug("Paint_DrawPoint Input exceeds the normal display range\r\n");
         printf("Xpoint = %d , this->m_width = %d  \r\n ", Xpoint, this->m_width);
@@ -214,31 +215,29 @@ auto Paint::draw_point(u16 Xpoint, u16 Ypoint, eImageColors Color, eDotSize Dot_
         return;
     }
 
-    const auto dotstyleint = eDotStyle::value(dot_style);
+    const auto dotsize = static_cast<int>(epxsize);
 
     if (dot_style == eDotStyle::DOT_FILL_AROUND) {
-        for (int XDir_Num = 0; XDir_Num < 2 * dotstyleint - 1; XDir_Num++) {
-            for (int YDir_Num = 0; YDir_Num < 2 * dotstyleint - 1; YDir_Num++) {
-                if (Xpoint + XDir_Num - dotstyleint < 0 || Ypoint + YDir_Num - dotstyleint < 0)
-                    break;
+        for (int XDir_Num = 0; XDir_Num < 2 * dotsize - 1; XDir_Num++) {
+            for (int YDir_Num = 0; YDir_Num < 2 * dotsize - 1; YDir_Num++) {
+                if (Xpoint + XDir_Num - dotsize < 0 || Ypoint + YDir_Num - dotsize < 0) break;
                 // printf("x = %d, y = %d\r\n", Xpoint + XDir_Num - eDotStyle::value(Dot_style),
                 // Ypoint + YDir_Num - eDotStyle::value(Dot_style));
-                this->draw_pixel(Xpoint + XDir_Num - dotstyleint, Ypoint + YDir_Num - dotstyleint,
-                                 Color);
+                this->draw_pixel(Xpoint + XDir_Num - dotsize, Ypoint + YDir_Num - dotsize, color);
             }
         }
         return;
     }
 
-    for (int XDir_Num = 0; XDir_Num < dotstyleint; XDir_Num++) {
-        for (int YDir_Num = 0; YDir_Num < dotstyleint; YDir_Num++) {
-            this->draw_pixel(Xpoint + XDir_Num - 1, Ypoint + YDir_Num - 1, Color);
+    for (int XDir_Num = 0; XDir_Num < dotsize; XDir_Num++) {
+        for (int YDir_Num = 0; YDir_Num < dotsize; YDir_Num++) {
+            this->draw_pixel(Xpoint + XDir_Num - 1, Ypoint + YDir_Num - 1, color);
         }
     }
 }
 
 auto Paint::draw_line(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color,
-                      eDotSize Line_width, eLineStyle Line_Style) {
+                      eDotSize Line_width, eLineStyle Line_Style) -> void {
     if (Xstart > this->m_width || Ystart > this->m_height || Xend > this->m_width ||
         Yend > this->m_height) {
         Debug("Paint_DrawLine Input exceeds the normal display range\r\n");
@@ -287,7 +286,7 @@ auto Paint::draw_line(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors C
 }
 
 auto Paint::draw_rectangle(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color,
-                           eDotSize Line_width, eDrawFilling Draw_Fill) {
+                           eDotSize Line_width, eDrawFilling Draw_Fill) -> void {
     if (Xstart > this->m_width || Ystart > this->m_height || Xend > this->m_width ||
         Yend > this->m_height) {
         Debug("Input exceeds the normal display range\r\n");
@@ -310,7 +309,7 @@ auto Paint::draw_rectangle(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageCol
 }
 
 auto Paint::draw_circle(u16 X_Center, u16 Y_Center, u16 Radius, eImageColors Color,
-                        eDotSize Line_width, eDrawFilling Draw_Fill) {
+                        eDotSize Line_width, eDrawFilling Draw_Fill) -> void {
     if (X_Center > this->m_width || Y_Center >= this->m_height) {
         Debug("Paint_DrawCircle Input exceeds the normal display range\r\n");
         return;
@@ -390,7 +389,7 @@ auto Paint::draw_circle(u16 X_Center, u16 Y_Center, u16 Radius, eImageColors Col
 }
 
 auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, const font::Font &Font,
-                      eImageColors Color_Foreground, eImageColors Color_Background) {
+                      eImageColors Color_Foreground, eImageColors Color_Background) -> void {
     if (Xpoint > this->m_width || Ypoint > this->m_height) {
         Debug("Paint_DrawChar Input exceeds the normal display range\r\n");
         return;
@@ -429,7 +428,7 @@ auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, const font:
 }
 
 auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, const font::Font &Font,
-                           eImageColors Color_Foreground, eImageColors Color_Background) {
+                           eImageColors Color_Foreground, eImageColors Color_Background) -> void {
     u16 Xpoint = Xstart;
     u16 Ypoint = Ystart;
 
@@ -462,7 +461,7 @@ auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, const fo
 }
 
 auto Paint::draw_number(u16 Xpoint, u16 Ypoint, double Nummber, const font::Font &Font, u16 Digit,
-                        eImageColors Color_Foreground, eImageColors Color_Background) {
+                        eImageColors Color_Foreground, eImageColors Color_Background) -> void {
     i16 Num_Bit = 0;
     i16 Str_Bit = 0;
     i32 temp = Nummber;
@@ -513,7 +512,7 @@ auto Paint::draw_number(u16 Xpoint, u16 Ypoint, double Nummber, const font::Font
 }
 
 auto Paint::draw_time(u16 Xstart, u16 Ystart, const PaintTime &pTime, const font::Font &Font,
-                      eImageColors Color_Foreground, eImageColors Color_Background) {
+                      eImageColors Color_Foreground, eImageColors Color_Background) -> void {
     constexpr char value[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     const auto Dx = Font.Width;
 
@@ -524,10 +523,10 @@ auto Paint::draw_time(u16 Xstart, u16 Ystart, const PaintTime &pTime, const font
                     Color_Foreground);
     this->draw_char(Xstart + Dx + Dx / 4 + Dx / 2, Ystart, ':', Font, Color_Background,
                     Color_Foreground);
-    this->draw_char(Xstart + Dx * 2 + Dx / 2, Ystart, value[pTime.Min / 10], Font,
-                    Color_Background, Color_Foreground);
-    this->draw_char(Xstart + Dx * 3 + Dx / 2, Ystart, value[pTime.Min % 10], Font,
-                    Color_Background, Color_Foreground);
+    this->draw_char(Xstart + Dx * 2 + Dx / 2, Ystart, value[pTime.Min / 10], Font, Color_Background,
+                    Color_Foreground);
+    this->draw_char(Xstart + Dx * 3 + Dx / 2, Ystart, value[pTime.Min % 10], Font, Color_Background,
+                    Color_Foreground);
     this->draw_char(Xstart + Dx * 4 + Dx / 2 - Dx / 4, Ystart, ':', Font, Color_Background,
                     Color_Foreground);
     this->draw_char(Xstart + Dx * 5, Ystart, value[pTime.Sec / 10], Font, Color_Background,
@@ -536,8 +535,8 @@ auto Paint::draw_time(u16 Xstart, u16 Ystart, const PaintTime &pTime, const font
                     Color_Foreground);
 }
 
-auto Paint::draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W_Image,
-                       u16 H_Image) {
+auto Paint::draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W_Image, u16 H_Image)
+    -> void {
     for (i32 j = 0; j < H_Image; j++) {
         for (i32 i = 0; i < W_Image; i++) {
             if (xStart + i < this->m_width_memory &&
@@ -553,7 +552,7 @@ auto Paint::draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W
     }
 }
 
-auto Paint::draw_bitmap(const unsigned char *image_buffer) {
+auto Paint::draw_bitmap(const unsigned char *image_buffer) -> void {
     for (u16 y = 0; y < this->m_height_byte; y++) {
         for (u16 x = 0; x < this->m_width_byte; x++) {  // 8 pixel =  1 byte
             const u32 Addr = x + y * this->m_width_byte;
@@ -562,7 +561,7 @@ auto Paint::draw_bitmap(const unsigned char *image_buffer) {
     }
 }
 
-auto Paint::draw_bitmap_block(const unsigned char *image_buffer, u8 Region) {
+auto Paint::draw_bitmap_block(const unsigned char *image_buffer, u8 Region) -> void {
     for (u16 y = 0; y < this->m_height_byte; y++) {
         for (u16 x = 0; x < this->m_width_byte; x++) {  // 8 pixel =  1 byte
             const u32 Addr = x + y * this->m_width_byte;
@@ -573,7 +572,7 @@ auto Paint::draw_bitmap_block(const unsigned char *image_buffer, u8 Region) {
 }
 
 auto Paint::bmp_windows(const unsigned char x, const unsigned char y, const unsigned char *pBmp,
-                        const unsigned char chWidth, const unsigned char chHeight) {
+                        const unsigned char chWidth, const unsigned char chHeight) -> void {
     const u16 byteWidth = (chWidth + 7) / 8;
 
     for (u16 j = 0; j < chHeight; j++) {
