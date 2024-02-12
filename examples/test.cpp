@@ -1,113 +1,243 @@
-// #include "EPD_Test.h"
-#include "DEV_Config.hpp"
-#include "ImageData.h"
+#include <hardware/gpio.h>
+#include <pico/stdio.h>
+#include <pico/time.h>
+
+#include <array>
+#include <cstdio>
+#include <memory>
+
+#include "ImageData.hpp"
+#include "display.hpp"
+#include "fonts.hpp"
 #include "paint.hpp"
+#include "paint_enums.hpp"
 
-auto OLED_1in3_C_test() {
-    DEV_Delay_ms(100);
+[[noreturn]] auto draw_stuff() {
+    using namespace pico_oled::paint;
 
-    printf("OELD_test Demo\r\n");
-    if (DEV_Module_Init() != 0) {
-        while (1) {
-            printf("END\r\n");
-        }
-    }
+    pico_oled::Display<pico_oled::eConType::SPI> display;
+    Paint paint;
 
-    /* Init */
-    OLED_1in3_C_Init();
-    OLED_1in3_C_Clear();
+    u8 imgbuf[pico_oled::k_imsize];
+    // u8 *imgbuf = new u8[pico_oled::k_imsize];
+    // std::array<u8, display.k_imsize> img;
+    // auto img = std::make_shared<std::array<u8, pico_oled::k_imsize>>();
 
-    UBYTE *BlackImage;
-    UWORD Imagesize =
-        ((OLED_1in3_C_WIDTH % 8 == 0) ? (OLED_1in3_C_WIDTH / 8) : (OLED_1in3_C_WIDTH / 8 + 1)) *
-        OLED_1in3_C_HEIGHT;
-    if ((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
-        while (1) {
-            printf("Failed to apply for black memory...\r\n");
-        }
-    }
+    // imgbuf[0] = 0xf0u;
+
+    display.init();
+    display.clear();
+
+    // paint.create_image(
+    //     imgbuf, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0,
+    //     eImageColors::WHITE);
+    // paint.select_image(imgbuf);
+
+    // sleep_ms(500);
+    // paint.clear_color(pico_oled::paint::eImageColors::BLACK);
+    // paint.draw_en_string(10,
+    //                      0,
+    //                      "Hello there",
+    //                      pico_oled::font::Font24,
+    //                      pico_oled::paint::eImageColors::WHITE,
+    //                      pico_oled::paint::eImageColors::BLACK);
+
+    // 3.Show image on page1
+    // display.show(imgbuf);
+    display.show(gImage_1inch3_C_1.data());
+
+    sleep_ms(1000);
+
+    // paint.clear_color(pico_oled::paint::eImageColors::BLACK);
+    // printf("0: %d\n", img->at(0));
+
+    while (1)
+        ;
+
+#if 0
     printf("Paint_NewImage\r\n");
-    Paint_NewImage(BlackImage, OLED_1in3_C_WIDTH, OLED_1in3_C_HEIGHT, 0, WHITE);
+    // Paint_NewImage(BlackImage, OLED_1in3_C_WIDTH, OLED_1in3_C_HEIGHT, 0, WHITE);
+    paint.create_image(
+        img, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0, eImageColors::WHITE);
 
     printf("Drawing\r\n");
     // 1.Select Image
-    Paint_SelectImage(BlackImage);
-    DEV_Delay_ms(500);
-    Paint_Clear(BLACK);
+    sleep_ms(500);
+    paint.clear_color(eImageColors::BLACK);
 
     // 2.Drawing on the image
     printf("Drawing:page 1\r\n");
-    Paint_DrawPoint(20, 10, WHITE, DOT_PIXEL_1X1, DOT_STYLE_DFT);
-    Paint_DrawPoint(30, 10, WHITE, DOT_PIXEL_2X2, DOT_STYLE_DFT);
-    Paint_DrawPoint(40, 10, WHITE, DOT_PIXEL_3X3, DOT_STYLE_DFT);
-    Paint_DrawLine(10, 10, 10, 20, WHITE, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawLine(20, 20, 20, 30, WHITE, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawLine(30, 30, 30, 40, WHITE, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawLine(40, 40, 40, 50, WHITE, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawCircle(60, 30, 15, WHITE, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawCircle(100, 40, 20, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawRectangle(50, 30, 60, 40, WHITE, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawRectangle(90, 30, 110, 50, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    BlackImage[0] = 0xf0;
+    paint.draw_point(20, 10, eImageColors::WHITE, eDotSize::DOT_PIXEL_1X1);
+    paint.draw_point(30, 10, eImageColors::WHITE, eDotSize::DOT_PIXEL_2X2);
+    paint.draw_point(40, 10, eImageColors::WHITE, eDotSize::DOT_PIXEL_3X3);
+
+    paint.draw_line(10,
+                    10,
+                    10,
+                    20,
+                    eImageColors::WHITE,
+                    eDotSize ::DOT_PIXEL_1X1,
+                    eLineStyle::LINE_STYLE_SOLID);
+    paint.draw_line(20,
+                    20,
+                    20,
+                    30,
+                    eImageColors::WHITE,
+                    eDotSize ::DOT_PIXEL_1X1,
+                    eLineStyle::LINE_STYLE_SOLID);
+    paint.draw_line(30,
+                    30,
+                    30,
+                    40,
+                    eImageColors::WHITE,
+                    eDotSize ::DOT_PIXEL_1X1,
+                    eLineStyle::LINE_STYLE_SOLID);
+    paint.draw_line(40,
+                    40,
+                    40,
+                    50,
+                    eImageColors::WHITE,
+                    eDotSize ::DOT_PIXEL_1X1,
+                    eLineStyle::LINE_STYLE_SOLID);
+
+    paint.draw_circle(
+        60, 30, 15, eImageColors::WHITE, eDotSize::DOT_PIXEL_1X1, eDrawFilling::DRAW_FILL_EMPTY);
+    paint.draw_circle(
+        100, 40, 20, eImageColors::WHITE, eDotSize::DOT_PIXEL_1X1, eDrawFilling::DRAW_FILL_FULL);
+
+    paint.draw_rectangle(50,
+                         30,
+                         60,
+                         40,
+                         eImageColors::WHITE,
+                         eDotSize::DOT_PIXEL_1X1,
+                         eDrawFilling::DRAW_FILL_EMPTY);
+    paint.draw_rectangle(90,
+                         30,
+                         110,
+                         50,
+                         eImageColors::BLACK,
+                         eDotSize::DOT_PIXEL_1X1,
+                         eDrawFilling::DRAW_FILL_FULL);
+
+    img->at(0) = 0xf0u;
+
     // 3.Show image on page1
-    OLED_1in3_C_Display(BlackImage);
-    DEV_Delay_ms(2000);
-    Paint_Clear(BLACK);
+    display.show(img);
 
-    // Drawing on the image
-    printf("Drawing:page 2\r\n");
-    Paint_DrawString_EN(10, 0, "Pico-OLED", &Font16, WHITE, BLACK);
-    Paint_DrawString_EN(10, 17, "hello world", &Font8, WHITE, BLACK);
-    Paint_DrawNum(10, 30, 123.1, &Font8, 2, WHITE, WHITE);
-    Paint_DrawNum(10, 43, 987654.2, &Font12, 2, WHITE, WHITE);
-    // Show image on page2
-    OLED_1in3_C_Display(BlackImage);
-    DEV_Delay_ms(2000);
-    Paint_Clear(BLACK);
+    sleep_ms(2000);
+    paint.clear_color(eImageColors::BLACK);
+    paint.draw_en_string(
+        10, 0, "Pico-OLED", pico_oled::font::Font16, eImageColors::WHITE, eImageColors::BLACK);
+    paint.draw_en_string(
+        10, 17, "Hello World", pico_oled::font::Font8, eImageColors::WHITE, eImageColors::BLACK);
+    paint.draw_number(
+        10, 30, 123.1, pico_oled::font::Font8, 2, eImageColors::WHITE, eImageColors::WHITE);
+    paint.draw_number(
+        10, 43, 987654.2, pico_oled::font::Font12, 2, eImageColors::WHITE, eImageColors::WHITE);
+    display.show(img);
+    sleep_ms(2000);
+    paint.clear_color(eImageColors::BLACK);
 
-    // Drawing on the image
-    printf("Drawing:page 3\r\n");
-    Paint_DrawString_CN(10, 0, "ÄãºÃAbc", &Font12CN, WHITE, WHITE);
-    Paint_DrawString_CN(0, 20, "µç×Ó", &Font24CN, WHITE, WHITE);
-    // Show image on page3
-    OLED_1in3_C_Display(BlackImage);
-    DEV_Delay_ms(2000);
+    // display.show(gImage_1inch3_C_1);
+    // sleep_ms(5000);
 
-    // Show image on page4
-    OLED_1in3_C_Display(gImage_1inch3_C_1);
-    DEV_Delay_ms(5000);
+    paint.create_image(
+        img, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_180, eImageColors::WHITE);
+    paint.clear_color(eImageColors::BLACK);
 
-    Paint_NewImage(BlackImage, OLED_1in3_C_WIDTH, OLED_1in3_C_HEIGHT, 180, WHITE);
-    Paint_Clear(BLACK);
-    int key0 = 15;
-    int key1 = 17;
+    constexpr int key0 = 15;
+    constexpr int key1 = 17;
     int key = 0;
-    DEV_GPIO_Mode(key0, 0);
-    DEV_GPIO_Mode(key1, 0);
 
-    Paint_Clear(BLACK);
-    OLED_1in3_C_Display(BlackImage);
+    gpio_set_dir(key0, GPIO_IN);
+    gpio_set_dir(key1, GPIO_IN);
 
     while (1) {
-        if (DEV_Digital_Read(key1) == 0) {
-            Paint_DrawRectangle(115, 5, 125, 15, WHITE, DOT_PIXEL_2X2, DRAW_FILL_FULL);
+        if (gpio_get(key1)) {
+            paint.draw_rectangle(115,
+                                 5,
+                                 125,
+                                 15,
+                                 pico_oled::paint::eImageColors::WHITE,
+                                 pico_oled::paint::eDotSize::DOT_PIXEL_2X2,
+                                 pico_oled::paint::eDrawFilling::DRAW_FILL_FULL);
             key = 1;
         } else {
-            Paint_DrawRectangle(115, 5, 125, 15, BLACK, DOT_PIXEL_2X2, DRAW_FILL_EMPTY);
+            paint.draw_rectangle(115,
+                                 5,
+                                 125,
+                                 15,
+                                 pico_oled::paint::eImageColors::BLACK,
+                                 pico_oled::paint::eDotSize::DOT_PIXEL_2X2,
+                                 pico_oled::paint::eDrawFilling::DRAW_FILL_EMPTY);
         }
 
-        if (DEV_Digital_Read(key0) == 0) {
-            Paint_DrawRectangle(115, 50, 125, 60, WHITE, DOT_PIXEL_2X2, DRAW_FILL_FULL);
+        if (gpio_get(key0)) {
+            paint.draw_rectangle(115,
+                                 50,
+                                 125,
+                                 60,
+                                 pico_oled::paint::eImageColors::WHITE,
+                                 pico_oled::paint::eDotSize::DOT_PIXEL_2X2,
+                                 pico_oled::paint::eDrawFilling::DRAW_FILL_FULL);
         } else {
-            Paint_DrawRectangle(115, 50, 125, 60, BLACK, DOT_PIXEL_2X2, DRAW_FILL_EMPTY);
+            paint.draw_rectangle(115,
+                                 50,
+                                 125,
+                                 60,
+                                 pico_oled::paint::eImageColors::BLACK,
+                                 pico_oled::paint::eDotSize::DOT_PIXEL_2X2,
+                                 pico_oled::paint::eDrawFilling::DRAW_FILL_EMPTY);
             key = 1;
         }
-        if (key == 1) {
-            OLED_1in3_C_Display(BlackImage);
-            Paint_Clear(BLACK);
+
+        if (key) {
+            display.show(img);
+            paint.clear_color(pico_oled::paint::eImageColors::BLACK);
         }
     }
+#endif
+}
 
-    DEV_Module_Exit();
-    return 0;
+auto init_hw() {
+    sleep_ms(1000);
+    stdio_init_all();
+
+    // SPI Config
+    spi_init(SPI_PORT, 10000 * 1000);
+    gpio_set_function(EPD_CLK_PIN, GPIO_FUNC_SPI);
+    gpio_set_function(EPD_MOSI_PIN, GPIO_FUNC_SPI);
+
+    /// General GPIO config
+    gpio_init(EPD_RST_PIN);
+    gpio_set_dir(EPD_RST_PIN, GPIO_OUT);
+    gpio_init(EPD_DC_PIN);
+    gpio_set_dir(EPD_DC_PIN, GPIO_OUT);
+    gpio_init(EPD_CS_PIN);
+    gpio_set_dir(EPD_CS_PIN, GPIO_OUT);
+    gpio_init(EPD_BL_PIN);
+    gpio_set_dir(EPD_BL_PIN, GPIO_OUT);
+
+    gpio_set_dir(EPD_CS_PIN, GPIO_OUT);
+    gpio_set_dir(EPD_BL_PIN, GPIO_OUT);
+
+    gpio_put(EPD_CS_PIN, 1);
+    gpio_put(EPD_DC_PIN, 0);
+    gpio_put(EPD_BL_PIN, 1);
+
+#if 1
+    // I2C Config
+    i2c_init(i2c1, 300 * 1000);
+    gpio_set_function(EPD_SDA_PIN, GPIO_FUNC_I2C);
+    gpio_set_function(EPD_SCL_PIN, GPIO_FUNC_I2C);
+    gpio_pull_up(EPD_SDA_PIN);
+    gpio_pull_up(EPD_SCL_PIN);
+#endif  // 0
+
+    printf("Successfull init\n");
+}
+[[noreturn]] auto main() -> int {
+    init_hw();
+    draw_stuff();
 }

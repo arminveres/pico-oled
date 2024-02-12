@@ -19,9 +19,9 @@ struct PaintTime {
     u8 Sec;    // 0 - 59
 };
 
-/**
- * Image attributes
- **/
+/// Image attributes
+///
+/// Holds an image that is drawn upon
 struct Paint {
     u8 *m_image_buf;
     u16 m_width;
@@ -42,31 +42,41 @@ struct Paint {
     ///     width   :   The width of the picture
     ///     Height  :   The height of the picture
     ///     Color   :   Whether the picture is inverted
-    auto create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color);
+    auto create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color)
+        -> void;
+
     /// Select Image
-    auto select_image(u8 *image);
+    auto select_image(u8 *image) -> void;
 
-    auto set_rotation(const eRotation rotation);
+    auto set_rotation(const eRotation rotation) -> void;
 
-    auto set_mirror_orientation(eMirrorOrientiation mirror);
+    auto set_mirror_orientation(eMirrorOrientiation mirror) -> void;
 
-    auto draw_pixel(u16 Xpoint, u16 Ypoint, eImageColors Color);
+    auto draw_pixel(u16 Xpoint, u16 Ypoint, eImageColors Color) -> void;
 
     /// Sets scaling and updates `m_width_byte`
-    auto set_scale(eScaling scale);
+    auto set_scale(eScaling scale) -> void;
 
-    auto clear_color(eImageColors Color);
+    auto clear_color(eImageColors Color) -> void;
 
     /// Clear color of window
-    auto ClearWindows(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color);
+    auto ClearWindows(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color) -> void;
 
     // Draw point
-    auto draw_point(u16 Xpoint, u16 Ypoint, eImageColors Color, eDotSize Dot_Pixel,
-                    eStyle Dot_FillWay);
+    auto draw_point(u16 Xpoint,
+                    u16 Ypoint,
+                    eImageColors Color,
+                    eDotSize Dot_Pixel,
+                    eDotStyle Dot_FillWay = eDotStyle::DOT_FILL_DEFAULT) -> void;
 
     /// Draw line with arbitraty slope
-    auto draw_line(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color,
-                   eDotSize Line_width, eLineStyle Line_Style);
+    auto draw_line(u16 Xstart,
+                   u16 Ystart,
+                   u16 Xend,
+                   u16 Yend,
+                   eImageColors Color,
+                   eDotSize Line_width,
+                   eLineStyle Line_Style) -> void;
 
     /// Draw a rectangle
     /// @params:
@@ -77,8 +87,13 @@ struct Paint {
     ///     Color  ：The color of the Rectangular segment,
     ///     Line_width: Line width,
     ///     Draw_Fill : Whether to fill the inside of the rectangle,
-    auto draw_rectangle(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color,
-                        eDotSize Line_width, eDrawFilling Draw_Fill);
+    auto draw_rectangle(u16 Xstart,
+                        u16 Ystart,
+                        u16 Xend,
+                        u16 Yend,
+                        eImageColors Color,
+                        eDotSize Line_width,
+                        eDrawFilling Draw_Fill) -> void;
 
     /// Use the 8-point method to draw a circle of the specified size at the specified position->
     /// @params:
@@ -88,8 +103,12 @@ struct Paint {
     ///    Color     ：The color of the ：circle segment,
     ///    Line_width: Line width,
     ///    Draw_Fill : Whether to fill the inside of the Circle,
-    auto draw_circle(u16 X_Center, u16 Y_Center, u16 Radius, eImageColors Color,
-                     eDotSize Line_width, eDrawFilling Draw_Fill);
+    auto draw_circle(u16 X_Center,
+                     u16 Y_Center,
+                     u16 Radius,
+                     eImageColors Color,
+                     eDotSize Line_width,
+                     eDrawFilling Draw_Fill) -> void;
 
     /// Show English characters
     ///
@@ -100,8 +119,12 @@ struct Paint {
     ///    Font             ：A structure pointer that displays a character size,
     ///    Color_Foreground : Select the foreground color,
     ///    Color_Background : Select the background color,
-    auto draw_char(u16 Xstart, u16 Ystart, const char Acsii_Char, const font::Font &Font,
-                   eImageColors Color_Foreground, eImageColors Color_Background);
+    auto draw_char(u16 Xstart,
+                   u16 Ystart,
+                   const char Acsii_Char,
+                   const font::Font &Font,
+                   eImageColors Color_Foreground,
+                   eImageColors Color_Background) -> void;
 
     /// Display the string
     ///
@@ -112,8 +135,12 @@ struct Paint {
     ///     Font             ：A structure pointer that displays a character size,
     ///     Color_Foreground : Select the foreground color,
     ///     Color_Background : Select the background color,
-    auto draw_en_string(u16 Xstart, u16 Ystart, const char *pString, const font::Font &Font,
-                        eImageColors Color_Foreground, eImageColors Color_Background);
+    auto draw_en_string(u16 Xstart,
+                        u16 Ystart,
+                        const char *pString,
+                        const font::Font &Font,
+                        eImageColors Color_Foreground,
+                        eImageColors Color_Background) -> void;
 
     /// Display nummber
     ///
@@ -125,8 +152,13 @@ struct Paint {
     ///     Digit            : Fractional width,
     ///     Color_Foreground : Select the foreground color,
     ///     Color_Background : Select the background color,
-    auto draw_number(u16 Xpoint, u16 Ypoint, double Nummber, const font::Font &Font, u16 Digit,
-                     eImageColors Color_Foreground, eImageColors Color_Background);
+    auto draw_number(u16 Xpoint,
+                     u16 Ypoint,
+                     double Nummber,
+                     const font::Font &Font,
+                     u16 Digit,
+                     eImageColors Color_Foreground,
+                     eImageColors Color_Background) -> void;
 
     /// Display time
     ///
@@ -137,8 +169,12 @@ struct Paint {
     ///     Font             ：A structure pointer that displays a character size,
     ///     Color_Foreground : Select the foreground color,
     ///     Color_Background : Select the background color,
-    auto draw_time(u16 Xstart, u16 Ystart, const PaintTime &pTime, const font::Font &Font,
-                   eImageColors Color_Foreground, eImageColors Color_Background);
+    auto draw_time(u16 Xstart,
+                   u16 Ystart,
+                   const PaintTime &pTime,
+                   const font::Font &Font,
+                   eImageColors Color_Foreground,
+                   eImageColors Color_Background) -> void;
 
     /// Display monochrome bitmap
     ///
@@ -147,14 +183,18 @@ struct Paint {
     /// @note:
     ///    Use a computer to convert the image into a corresponding array,
     ///    and then embed the array directly into Imagedata.cpp as a .c file.
-    auto draw_bitmap(const unsigned char *image_buffer);
+    auto draw_bitmap(const unsigned char *image_buffer) -> void;
 
-    auto draw_bitmap_block(const unsigned char *image_buffer, u8 Region);
+    auto draw_bitmap_block(const unsigned char *image_buffer, u8 Region) -> void;
 
-    auto draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W_Image, u16 H_Image);
+    auto draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W_Image, u16 H_Image)
+        -> void;
 
-    auto bmp_windows(unsigned char x, unsigned char y, const unsigned char *pBmp,
-                     unsigned char chWidth, unsigned char chHeight);
+    auto bmp_windows(unsigned char x,
+                     unsigned char y,
+                     const unsigned char *pBmp,
+                     unsigned char chWidth,
+                     unsigned char chHeight) -> void;
 };
 }  // namespace pico_oled::paint
 #endif

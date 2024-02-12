@@ -13,7 +13,7 @@ using namespace pico_oled::paint;
 
 auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color)
     -> void {
-    // this->m_image_buf = nullptr;
+    this->m_image_buf = nullptr;
     this->m_image_buf = image;
 
     this->m_width_memory = Width;
@@ -49,8 +49,6 @@ auto Paint::select_image(u8 *image) -> void { this->m_image_buf = image; }
 auto Paint::set_rotation(const eRotation rotation) -> void { this->m_rotation = rotation; }
 
 auto Paint::set_mirror_orientation(eMirrorOrientiation mirror) -> void {
-    Debug("mirror image x:%s, y:%s\r\n", (mirror & 0x01) ? "mirror" : "none",
-          ((mirror >> 1) & 0x01) ? "mirror" : "none");
     this->m_mirror = mirror;
 }
 
@@ -138,6 +136,7 @@ auto Paint::draw_pixel(u16 Xpoint, u16 Ypoint, eImageColors Color) -> void {
                 this->m_image_buf[Addr] = Rdata & ~(0x80 >> (X % 8));
             else
                 this->m_image_buf[Addr] = Rdata | (0x80 >> (X % 8));
+            printf("buf: 0%x\n", this->m_image_buf[Addr]);
         } break;
         case eScaling::QUAD: {
             u32 Addr = X / 4 + Y * this->m_width_byte;
@@ -206,8 +205,8 @@ auto Paint::ClearWindows(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColor
     }
 }
 
-auto Paint::draw_point(u16 Xpoint, u16 Ypoint, eImageColors color, eDotSize epxsize,
-                       eDotStyle dot_style) -> void {
+auto Paint::draw_point(
+    u16 Xpoint, u16 Ypoint, eImageColors color, eDotSize epxsize, eDotStyle dot_style) -> void {
     if (Xpoint > this->m_width || Ypoint > this->m_height) {
         Debug("Paint_DrawPoint Input exceeds the normal display range\r\n");
         printf("Xpoint = %d , this->m_width = %d  \r\n ", Xpoint, this->m_width);
@@ -236,8 +235,13 @@ auto Paint::draw_point(u16 Xpoint, u16 Ypoint, eImageColors color, eDotSize epxs
     }
 }
 
-auto Paint::draw_line(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color,
-                      eDotSize Line_width, eLineStyle Line_Style) -> void {
+auto Paint::draw_line(u16 Xstart,
+                      u16 Ystart,
+                      u16 Xend,
+                      u16 Yend,
+                      eImageColors Color,
+                      eDotSize Line_width,
+                      eLineStyle Line_Style) -> void {
     if (Xstart > this->m_width || Ystart > this->m_height || Xend > this->m_width ||
         Yend > this->m_height) {
         Debug("Paint_DrawLine Input exceeds the normal display range\r\n");
@@ -263,11 +267,11 @@ auto Paint::draw_line(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors C
         if (Line_Style == eLineStyle::LINE_STYLE_DOTTED && Dotted_Len % 3 == 0) {
             // Debug("LINE_DOTTED\r\n");
             if (Color == eImageColors::BLACK)
-                this->draw_point(Xpoint, Ypoint, eImageColors::BLACK, Line_width,
-                                 eDotStyle::DOT_FILL_DEFAULT);
+                this->draw_point(
+                    Xpoint, Ypoint, eImageColors::BLACK, Line_width, eDotStyle::DOT_FILL_DEFAULT);
             else
-                this->draw_point(Xpoint, Ypoint, eImageColors::WHITE, Line_width,
-                                 eDotStyle::DOT_FILL_DEFAULT);
+                this->draw_point(
+                    Xpoint, Ypoint, eImageColors::WHITE, Line_width, eDotStyle::DOT_FILL_DEFAULT);
             Dotted_Len = 0;
         } else {
             this->draw_point(Xpoint, Ypoint, Color, Line_width, eDotStyle::DOT_FILL_DEFAULT);
@@ -285,8 +289,13 @@ auto Paint::draw_line(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors C
     }
 }
 
-auto Paint::draw_rectangle(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageColors Color,
-                           eDotSize Line_width, eDrawFilling Draw_Fill) -> void {
+auto Paint::draw_rectangle(u16 Xstart,
+                           u16 Ystart,
+                           u16 Xend,
+                           u16 Yend,
+                           eImageColors Color,
+                           eDotSize Line_width,
+                           eDrawFilling Draw_Fill) -> void {
     if (Xstart > this->m_width || Ystart > this->m_height || Xend > this->m_width ||
         Yend > this->m_height) {
         Debug("Input exceeds the normal display range\r\n");
@@ -295,21 +304,25 @@ auto Paint::draw_rectangle(u16 Xstart, u16 Ystart, u16 Xend, u16 Yend, eImageCol
 
     if (Draw_Fill == eDrawFilling::DRAW_FILL_FULL) {
         for (u16 Ypoint = Ystart; Ypoint < Yend; Ypoint++) {
-            this->draw_line(Xstart, Ypoint, Xend, Ypoint, Color, Line_width,
-                            eLineStyle::LINE_STYLE_SOLID);
+            this->draw_line(
+                Xstart, Ypoint, Xend, Ypoint, Color, Line_width, eLineStyle::LINE_STYLE_SOLID);
         }
     } else {
-        this->draw_line(Xstart, Ystart, Xend, Ystart, Color, Line_width,
-                        eLineStyle::LINE_STYLE_SOLID);
-        this->draw_line(Xstart, Ystart, Xstart, Yend, Color, Line_width,
-                        eLineStyle::LINE_STYLE_SOLID);
+        this->draw_line(
+            Xstart, Ystart, Xend, Ystart, Color, Line_width, eLineStyle::LINE_STYLE_SOLID);
+        this->draw_line(
+            Xstart, Ystart, Xstart, Yend, Color, Line_width, eLineStyle::LINE_STYLE_SOLID);
         this->draw_line(Xend, Yend, Xend, Ystart, Color, Line_width, eLineStyle::LINE_STYLE_SOLID);
         this->draw_line(Xend, Yend, Xstart, Yend, Color, Line_width, eLineStyle::LINE_STYLE_SOLID);
     }
 }
 
-auto Paint::draw_circle(u16 X_Center, u16 Y_Center, u16 Radius, eImageColors Color,
-                        eDotSize Line_width, eDrawFilling Draw_Fill) -> void {
+auto Paint::draw_circle(u16 X_Center,
+                        u16 Y_Center,
+                        u16 Radius,
+                        eImageColors Color,
+                        eDotSize Line_width,
+                        eDrawFilling Draw_Fill) -> void {
     if (X_Center > this->m_width || Y_Center >= this->m_height) {
         Debug("Paint_DrawCircle Input exceeds the normal display range\r\n");
         return;
@@ -326,29 +339,46 @@ auto Paint::draw_circle(u16 X_Center, u16 Y_Center, u16 Radius, eImageColors Col
     if (Draw_Fill == eDrawFilling::DRAW_FILL_FULL) {
         while (XCurrent <= YCurrent) {  // Realistic circles
             for (i16 sCountY = XCurrent; sCountY <= YCurrent; sCountY++) {
-                this->draw_point(X_Center + XCurrent, Y_Center + sCountY, Color,
+                this->draw_point(X_Center + XCurrent,
+                                 Y_Center + sCountY,
+                                 Color,
                                  eDotSize::DOT_PIXEL_DFT,
                                  eDotStyle::DOT_FILL_DEFAULT);  // 1
-                this->draw_point(X_Center - XCurrent, Y_Center + sCountY, Color,
+                this->draw_point(X_Center - XCurrent,
+                                 Y_Center + sCountY,
+                                 Color,
                                  eDotSize::DOT_PIXEL_DFT,
                                  eDotStyle::DOT_FILL_DEFAULT);  // 2
-                this->draw_point(X_Center - sCountY, Y_Center + XCurrent, Color,
+                this->draw_point(X_Center - sCountY,
+                                 Y_Center + XCurrent,
+                                 Color,
                                  eDotSize::DOT_PIXEL_DFT,
                                  eDotStyle::DOT_FILL_DEFAULT);  // 3
-                this->draw_point(X_Center - sCountY, Y_Center - XCurrent, Color,
+                this->draw_point(X_Center - sCountY,
+                                 Y_Center - XCurrent,
+                                 Color,
                                  eDotSize::DOT_PIXEL_DFT,
                                  eDotStyle::DOT_FILL_DEFAULT);  // 4
-                this->draw_point(X_Center - XCurrent, Y_Center - sCountY, Color,
+                this->draw_point(X_Center - XCurrent,
+                                 Y_Center - sCountY,
+                                 Color,
                                  eDotSize::DOT_PIXEL_DFT,
                                  eDotStyle::DOT_FILL_DEFAULT);  // 5
-                this->draw_point(X_Center + XCurrent, Y_Center - sCountY, Color,
+                this->draw_point(X_Center + XCurrent,
+                                 Y_Center - sCountY,
+                                 Color,
                                  eDotSize::DOT_PIXEL_DFT,
                                  eDotStyle::DOT_FILL_DEFAULT);  // 6
-                this->draw_point(X_Center + sCountY, Y_Center - XCurrent, Color,
+                this->draw_point(X_Center + sCountY,
+                                 Y_Center - XCurrent,
+                                 Color,
                                  eDotSize::DOT_PIXEL_DFT,
                                  eDotStyle::DOT_FILL_DEFAULT);  // 7
-                this->draw_point(X_Center + sCountY, Y_Center + XCurrent, Color,
-                                 eDotSize::DOT_PIXEL_DFT, eDotStyle::DOT_FILL_DEFAULT);
+                this->draw_point(X_Center + sCountY,
+                                 Y_Center + XCurrent,
+                                 Color,
+                                 eDotSize::DOT_PIXEL_DFT,
+                                 eDotStyle::DOT_FILL_DEFAULT);
             }
             if (Esp < 0)
                 Esp += 4 * XCurrent + 6;
@@ -360,21 +390,45 @@ auto Paint::draw_circle(u16 X_Center, u16 Y_Center, u16 Radius, eImageColors Col
         }
     } else {  // Draw a hollow circle
         while (XCurrent <= YCurrent) {
-            this->draw_point(X_Center + XCurrent, Y_Center + YCurrent, Color, Line_width,
+            this->draw_point(X_Center + XCurrent,
+                             Y_Center + YCurrent,
+                             Color,
+                             Line_width,
                              eDotStyle::DOT_FILL_DEFAULT);  // 1
-            this->draw_point(X_Center - XCurrent, Y_Center + YCurrent, Color, Line_width,
+            this->draw_point(X_Center - XCurrent,
+                             Y_Center + YCurrent,
+                             Color,
+                             Line_width,
                              eDotStyle::DOT_FILL_DEFAULT);  // 2
-            this->draw_point(X_Center - YCurrent, Y_Center + XCurrent, Color, Line_width,
+            this->draw_point(X_Center - YCurrent,
+                             Y_Center + XCurrent,
+                             Color,
+                             Line_width,
                              eDotStyle::DOT_FILL_DEFAULT);  // 3
-            this->draw_point(X_Center - YCurrent, Y_Center - XCurrent, Color, Line_width,
+            this->draw_point(X_Center - YCurrent,
+                             Y_Center - XCurrent,
+                             Color,
+                             Line_width,
                              eDotStyle::DOT_FILL_DEFAULT);  // 4
-            this->draw_point(X_Center - XCurrent, Y_Center - YCurrent, Color, Line_width,
+            this->draw_point(X_Center - XCurrent,
+                             Y_Center - YCurrent,
+                             Color,
+                             Line_width,
                              eDotStyle::DOT_FILL_DEFAULT);  // 5
-            this->draw_point(X_Center + XCurrent, Y_Center - YCurrent, Color, Line_width,
+            this->draw_point(X_Center + XCurrent,
+                             Y_Center - YCurrent,
+                             Color,
+                             Line_width,
                              eDotStyle::DOT_FILL_DEFAULT);  // 6
-            this->draw_point(X_Center + YCurrent, Y_Center - XCurrent, Color, Line_width,
+            this->draw_point(X_Center + YCurrent,
+                             Y_Center - XCurrent,
+                             Color,
+                             Line_width,
                              eDotStyle::DOT_FILL_DEFAULT);  // 7
-            this->draw_point(X_Center + YCurrent, Y_Center + XCurrent, Color, Line_width,
+            this->draw_point(X_Center + YCurrent,
+                             Y_Center + XCurrent,
+                             Color,
+                             Line_width,
                              eDotStyle::DOT_FILL_DEFAULT);  // 0
 
             if (Esp < 0)
@@ -388,8 +442,12 @@ auto Paint::draw_circle(u16 X_Center, u16 Y_Center, u16 Radius, eImageColors Col
     }
 }
 
-auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, const font::Font &Font,
-                      eImageColors Color_Foreground, eImageColors Color_Background) -> void {
+auto Paint::draw_char(u16 Xpoint,
+                      u16 Ypoint,
+                      const char Acsii_Char,
+                      const font::Font &Font,
+                      eImageColors Color_Foreground,
+                      eImageColors Color_Background) -> void {
     if (Xpoint > this->m_width || Ypoint > this->m_height) {
         Debug("Paint_DrawChar Input exceeds the normal display range\r\n");
         return;
@@ -403,8 +461,8 @@ auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, const font:
         for (u16 Column = 0; Column < Font.Width; Column++) {
             // To determine whether the font background color and screen background
             // color is consistent
-            if (eImageColors::FONT_BACKGROUND ==
-                Color_Background) {  // this process is to speed up the scan
+            // this process is to speed up the scan
+            if (eImageColors::FONT_BACKGROUND == Color_Background) {
                 if (*ptr & (0x80 >> (Column % 8)))
                     this->draw_pixel(Xpoint + Column, Ypoint + Page, Color_Foreground);
                 // Paint_DrawPoint(Xpoint + Column, Ypoint + Page, Color_Foreground,
@@ -427,8 +485,12 @@ auto Paint::draw_char(u16 Xpoint, u16 Ypoint, const char Acsii_Char, const font:
     }  // Write all
 }
 
-auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, const font::Font &Font,
-                           eImageColors Color_Foreground, eImageColors Color_Background) -> void {
+auto Paint::draw_en_string(u16 Xstart,
+                           u16 Ystart,
+                           const char *pString,
+                           const font::Font &Font,
+                           eImageColors Color_Foreground,
+                           eImageColors Color_Background) -> void {
     u16 Xpoint = Xstart;
     u16 Ypoint = Ystart;
 
@@ -450,6 +512,8 @@ auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, const fo
             Xpoint = Xstart;
             Ypoint = Ystart;
         }
+
+        printf("drawing %c\n", *pString);
         this->draw_char(Xpoint, Ypoint, *pString, Font, Color_Background, Color_Foreground);
 
         // The next character of the address
@@ -460,8 +524,13 @@ auto Paint::draw_en_string(u16 Xstart, u16 Ystart, const char *pString, const fo
     }
 }
 
-auto Paint::draw_number(u16 Xpoint, u16 Ypoint, double Nummber, const font::Font &Font, u16 Digit,
-                        eImageColors Color_Foreground, eImageColors Color_Background) -> void {
+auto Paint::draw_number(u16 Xpoint,
+                        u16 Ypoint,
+                        double Nummber,
+                        const font::Font &Font,
+                        u16 Digit,
+                        eImageColors Color_Foreground,
+                        eImageColors Color_Background) -> void {
     i16 Num_Bit = 0;
     i16 Str_Bit = 0;
     i32 temp = Nummber;
@@ -507,32 +576,44 @@ auto Paint::draw_number(u16 Xpoint, u16 Ypoint, double Nummber, const font::Font
     }
 
     // show
-    this->draw_en_string(Xpoint, Ypoint, string_arr.data(), Font, Color_Background,
-                         Color_Foreground);
+    this->draw_en_string(
+        Xpoint, Ypoint, string_arr.data(), Font, Color_Background, Color_Foreground);
 }
 
-auto Paint::draw_time(u16 Xstart, u16 Ystart, const PaintTime &pTime, const font::Font &Font,
-                      eImageColors Color_Foreground, eImageColors Color_Background) -> void {
+auto Paint::draw_time(u16 Xstart,
+                      u16 Ystart,
+                      const PaintTime &pTime,
+                      const font::Font &Font,
+                      eImageColors Color_Foreground,
+                      eImageColors Color_Background) -> void {
     constexpr char value[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     const auto Dx = Font.Width;
 
     // Write data into the cache
-    this->draw_char(Xstart, Ystart, value[pTime.Hour / 10], Font, Color_Background,
+    this->draw_char(
+        Xstart, Ystart, value[pTime.Hour / 10], Font, Color_Background, Color_Foreground);
+    this->draw_char(
+        Xstart + Dx, Ystart, value[pTime.Hour % 10], Font, Color_Background, Color_Foreground);
+    this->draw_char(
+        Xstart + Dx + Dx / 4 + Dx / 2, Ystart, ':', Font, Color_Background, Color_Foreground);
+    this->draw_char(Xstart + Dx * 2 + Dx / 2,
+                    Ystart,
+                    value[pTime.Min / 10],
+                    Font,
+                    Color_Background,
                     Color_Foreground);
-    this->draw_char(Xstart + Dx, Ystart, value[pTime.Hour % 10], Font, Color_Background,
+    this->draw_char(Xstart + Dx * 3 + Dx / 2,
+                    Ystart,
+                    value[pTime.Min % 10],
+                    Font,
+                    Color_Background,
                     Color_Foreground);
-    this->draw_char(Xstart + Dx + Dx / 4 + Dx / 2, Ystart, ':', Font, Color_Background,
-                    Color_Foreground);
-    this->draw_char(Xstart + Dx * 2 + Dx / 2, Ystart, value[pTime.Min / 10], Font, Color_Background,
-                    Color_Foreground);
-    this->draw_char(Xstart + Dx * 3 + Dx / 2, Ystart, value[pTime.Min % 10], Font, Color_Background,
-                    Color_Foreground);
-    this->draw_char(Xstart + Dx * 4 + Dx / 2 - Dx / 4, Ystart, ':', Font, Color_Background,
-                    Color_Foreground);
-    this->draw_char(Xstart + Dx * 5, Ystart, value[pTime.Sec / 10], Font, Color_Background,
-                    Color_Foreground);
-    this->draw_char(Xstart + Dx * 6, Ystart, value[pTime.Sec % 10], Font, Color_Background,
-                    Color_Foreground);
+    this->draw_char(
+        Xstart + Dx * 4 + Dx / 2 - Dx / 4, Ystart, ':', Font, Color_Background, Color_Foreground);
+    this->draw_char(
+        Xstart + Dx * 5, Ystart, value[pTime.Sec / 10], Font, Color_Background, Color_Foreground);
+    this->draw_char(
+        Xstart + Dx * 6, Ystart, value[pTime.Sec % 10], Font, Color_Background, Color_Foreground);
 }
 
 auto Paint::draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W_Image, u16 H_Image)
@@ -571,8 +652,11 @@ auto Paint::draw_bitmap_block(const unsigned char *image_buffer, u8 Region) -> v
     }
 }
 
-auto Paint::bmp_windows(const unsigned char x, const unsigned char y, const unsigned char *pBmp,
-                        const unsigned char chWidth, const unsigned char chHeight) -> void {
+auto Paint::bmp_windows(const unsigned char x,
+                        const unsigned char y,
+                        const unsigned char *pBmp,
+                        const unsigned char chWidth,
+                        const unsigned char chHeight) -> void {
     const u16 byteWidth = (chWidth + 7) / 8;
 
     for (u16 j = 0; j < chHeight; j++) {

@@ -37,17 +37,11 @@ add_compile_options(
     -fdata-sections
 )
 
-add_library(pico-oled-paint
-    src/paint.cpp
+add_link_options(
+    -Wl,-gc-sections
+    -Wl,-print-memory-usage
 )
 
-target_link_libraries(pico-oled-paint PUBLIC
-    pico_stdlib
-    hardware_spi
-    hardware_i2c
-    hardware_pwm
-    hardware_adc
-)
 
 add_library(pico-oled-fonts
     src/font12.cpp
@@ -55,6 +49,19 @@ add_library(pico-oled-fonts
     src/font20.cpp
     src/font24.cpp
     src/font8.cpp
+)
+
+add_library(pico-oled-paint
+    src/paint.cpp
+)
+
+target_link_libraries(pico-oled-paint PUBLIC
+    pico-oled-fonts
+
+    pico_stdlib
+    hardware_spi
+    hardware_i2c
+    hardware_adc
 )
 
 add_executable(test
@@ -68,6 +75,13 @@ target_link_libraries(test PUBLIC
     pico_stdlib
     hardware_spi
     hardware_i2c
-    hardware_pwm
     hardware_adc
 )
+
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test 1)
+pico_enable_stdio_uart(test 0)
+
+# create map/bin/hex/uf2 file etc.
+pico_add_extra_outputs(test)

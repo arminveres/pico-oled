@@ -17,4 +17,4 @@ using u64 = std::uint64_t;
 using f32 = std::float_t;
 using f64 = std::double_t;
 
-#endif //__TYPES_PICO_OLED_H_
+#endif  //__TYPES_PICO_OLED_H_

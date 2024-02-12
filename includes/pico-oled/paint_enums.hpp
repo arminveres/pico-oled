@@ -65,17 +65,11 @@ enum class eDotSize {
 /// Point size fill style
 ///
 /// TODO(aver): Really don't know why the original guy used this for calculations ... refactor...
-struct eDotStyle {
-    enum {
-        DOT_FILL_AROUND = 1,  // dot pixel 1 x 1
-        DOT_FILL_RIGHTUP,     // dot pixel 2 X 2
-        DOT_FILL_DEFAULT = DOT_FILL_AROUND
-    };
-    static inline auto value(const decltype(eDotStyle::DOT_FILL_AROUND) &eval) {
-        return static_cast<int>(eval);
-    }
+enum class eDotStyle {
+    DOT_FILL_AROUND = 1,  // dot pixel 1 x 1
+    DOT_FILL_RIGHTUP,     // dot pixel 2 X 2
+    DOT_FILL_DEFAULT = DOT_FILL_AROUND
 };
-using eStyle = decltype(eDotStyle::DOT_FILL_AROUND);
 
 /**
  * Line style, solid or dashed
