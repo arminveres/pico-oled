@@ -35,9 +35,6 @@
 #include <hardware/spi.h>
 #include <pico/time.h>
 
-#include <array>
-#include <variant>
-
 #include "types.hpp"
 
 static constexpr auto IIC_CMD = 0x00;
@@ -112,25 +109,25 @@ class Display {
         NOP = 0xE3,
     };
 
-    auto init() const volatile {
-        reset();
-        init_regs();
-        sleep_ms(200);
-        write_reg(0xAFu);
-    }
+    // auto init() const {
+    //     reset();
+    //     init_regs();
+    //     sleep_ms(200);
+    //     write_to_reg(eRegisters::TURN_DISP_ON);
+    // }
 
     // auto show(const u8 *imbuf) const {
     // template <u32 imsize>
     // auto show(const std::array<u8, imsize> &imbuf) const {
-    auto show(const u8 *imbuf) const volatile {
+    auto show(const u8 *imbuf) const {
         constexpr auto l_width = k_width / 8;
         // write starting row
-        write_reg(0xB0u);
+        write_reg_val(0xB0u);
 
         for (u8 j = 0; j < k_height; ++j) {
             const u8 column = k_height - 1 - j;
-            write_reg(0x00 + (column & 0x0Fu));
-            write_reg(0x10 + (column >> 0x4u));
+            write_reg_val(get_reg_val(eRegisters::SET_LOW_COL_ADR) + (column & 0x0Fu));
+            write_reg_val(get_reg_val(eRegisters::SET_HIGH_COL_ADR) + (column >> 0x04u));
 
             for (u8 i = 0; i < l_width; ++i) {
                 auto temp = imbuf[i + j * l_width];
@@ -140,21 +137,21 @@ class Display {
         }
     }
 
-    auto clear() {
+    auto clear() const {
         constexpr auto l_width = k_width / 8;
         // write starting row
-        write_reg(0xB0u);
+        write_reg_val(0xB0u);
         for (u8 j = 0; j < k_height; ++j) {
             const u8 column = k_height - 1 - j;
-            write_reg(0x00 + (column & 0x0Fu));
-            write_reg(0x10 + (column >> 0x4u));
+            write_reg_val(get_reg_val(eRegisters::SET_LOW_COL_ADR) + (column & 0x0Fu));
+            write_reg_val(get_reg_val(eRegisters::SET_HIGH_COL_ADR) + (column >> 0x4u));
             for (u16 i = 0; i < l_width; ++i) {
                 write_data(0x00u);
             }
         }
     }
 
-    auto reset() const volatile {
+    auto reset() const {
         gpio_put(EPD_RST_PIN, 1);
         sleep_ms(100);
         gpio_put(EPD_RST_PIN, 0);
@@ -171,36 +168,107 @@ class Display {
     }
     static auto get_reg_val(const eRegisters reg) -> u8 { return static_cast<u8>(reg); }
 
-    Display() {}
-    ~Display() {}
+    Display() {
+        reset();
+        init_regs();
+        sleep_ms(200);
+        write_to_reg(eRegisters::TURN_DISP_ON);
+    };
 
+    ~Display() = default;
     Display(Display &&) = delete;
     Display(const Display &) = delete;
     Display &operator=(Display &&) = delete;
     Display &operator=(const Display &) = delete;
 
    private:
-    auto write_reg(const u8 var_reg) const volatile {
-        u8 reg = 0;
+    /// Wirte to register, can be subseded by `write_reg_val()` if it takes a (double) byte command
+    auto write_to_reg(const eRegisters reg) const {
+        auto value = get_reg_val(reg);
 
-        gpio_put(EPD_DC_PIN, 0);
-        gpio_put(EPD_CS_PIN, 0);
-        spi_write_blocking(SPI_PORT, &var_reg, 1);
-        // spi_write_blocking(SPI_PORT, &reg, 1);
-        gpio_put(EPD_CS_PIN, 1);
+        if constexpr (T == eConType::SPI) {
+            gpio_put(EPD_DC_PIN, 0);
+            gpio_put(EPD_CS_PIN, 0);
+            spi_write_blocking(SPI_PORT, &value, 1);
+            // spi_write_blocking(SPI_PORT, &reg, 1);
+            gpio_put(EPD_CS_PIN, 1);
 
+        } else if constexpr (T == eConType::I2C) {
+            const u8 data[2] = {IIC_CMD, value};
+            i2c_write_blocking(I2C_PORT, 0x3C, data, 2, false);
+        }
     }
 
-    auto write_data(const u8 reg) const volatile {
-        // if constexpr (T == eConType::SPI) {
-        gpio_put(EPD_DC_PIN, 1);
-        gpio_put(EPD_CS_PIN, 0);
-        spi_write_blocking(SPI_PORT, &reg, 1);
-        gpio_put(EPD_CS_PIN, 1);
+    /// Wite Value directly to device, usually in combination with and preceded by `write_to_reg()`
+    auto write_reg_val(const u8 value) const {
+        if constexpr (T == eConType::SPI) {
+            gpio_put(EPD_DC_PIN, 0);
+            gpio_put(EPD_CS_PIN, 0);
+            spi_write_blocking(SPI_PORT, &value, 1);
+            gpio_put(EPD_CS_PIN, 1);
 
+        } else if constexpr (T == eConType::I2C) {
+            const u8 data[2] = {IIC_CMD, value};
+            i2c_write_blocking(I2C_PORT, 0x3C, data, 2, false);
+        }
     }
 
-    auto init_regs() const volatile {
+    auto write_data(const u8 reg) const {
+        if constexpr (T == eConType::SPI) {
+            gpio_put(EPD_DC_PIN, 1);
+            gpio_put(EPD_CS_PIN, 0);
+            spi_write_blocking(SPI_PORT, &reg, 1);
+            gpio_put(EPD_CS_PIN, 1);
+
+        } else if constexpr (T == eConType::I2C) {
+            const u8 data[2] = {IIC_RAM, reg};
+            i2c_write_blocking(I2C_PORT, 0x3C, data, 2, false);
+        }
+    }
+
+    auto init_regs() const {
+        write_to_reg(eRegisters::TURN_DISP_OFF);
+
+        write_to_reg(eRegisters::SET_LOW_COL_ADR);
+        write_to_reg(eRegisters::SET_HIGH_COL_ADR);
+
+        write_reg_val(0xB0);  // set page address
+
+        write_to_reg(eRegisters::SET_START_LINE);
+        write_reg_val(0x00);  // set to beginning
+
+        write_to_reg(eRegisters::CONTRAST_CTRL);
+        write_reg_val(0x6f);
+        write_to_reg(eRegisters::SET_MEM_VERT_ADDRING);
+
+        write_to_reg(eRegisters::SET_SEGMENT_REMAP_NORM);
+        write_reg_val(0xC0);  // set com scan direction
+        write_to_reg(eRegisters::DISABLE_DISP_ON);
+
+        write_to_reg(eRegisters::DISP_COL_NORMAL);
+        write_to_reg(eRegisters::SET_MULTIPLEX_RATIO);
+        write_reg_val(0x3F);  // 1/64 duty
+
+        write_to_reg(eRegisters::SET_DISP_OFFSET);
+        write_reg_val(0x60);
+
+        write_to_reg(eRegisters::SET_OSC_CLOCK_DIV);
+        write_reg_val(0x41);
+
+        write_to_reg(eRegisters::SET_PRECHARGE_PER);
+        write_reg_val(0x22);
+
+        write_to_reg(eRegisters::SET_VCOM_DESEL);
+        write_reg_val(0x35);
+
+        write_to_reg(eRegisters::SET_DCDC_ON);
+        write_to_reg(eRegisters::SET_DCDC_PUMP_ON);
+
+#if 0
+        write_reg(0xAEu); /*turn off OLED display*/
+
+        write_reg(0x00u); /*set lower column address*/
+        write_reg(0x10u); /*set higher column address*/
 
         write_reg(0xB0u); /*set page address*/
 
@@ -233,6 +301,7 @@ class Display {
 
         write_reg(0xADu); /*set charge pump enable*/
         write_reg(0x8Au); /*Set DC-DC enable (a=0:disable; a=1:enable) */
+#endif
     }
 };
 }  // namespace pico_oled

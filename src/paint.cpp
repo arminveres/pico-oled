@@ -13,7 +13,6 @@ using namespace pico_oled::paint;
 
 auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color)
     -> void {
-    this->m_image_buf = nullptr;
     this->m_image_buf = image;
 
     this->m_width_memory = Width;
@@ -23,8 +22,6 @@ auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, e
 
     this->m_width_byte = (Width % 8 == 0) ? (Width / 8) : (Width / 8 + 1);
     this->m_height_byte = Height;
-    //    printf("WidthByte = %d, HeightByte = %d\r\n", this->m_width_byte,
-    //    this->m_height_byte); printf(" EPD_WIDTH / 8 = %d\r\n",  122 / 8);
 
     this->m_rotation = rotation;
     this->m_mirror = eMirrorOrientiation::MIRROR_NONE;
@@ -136,7 +133,7 @@ auto Paint::draw_pixel(u16 Xpoint, u16 Ypoint, eImageColors Color) -> void {
                 this->m_image_buf[Addr] = Rdata & ~(0x80 >> (X % 8));
             else
                 this->m_image_buf[Addr] = Rdata | (0x80 >> (X % 8));
-            printf("buf: 0%x\n", this->m_image_buf[Addr]);
+
         } break;
         case eScaling::QUAD: {
             u32 Addr = X / 4 + Y * this->m_width_byte;
@@ -513,7 +510,6 @@ auto Paint::draw_en_string(u16 Xstart,
             Ypoint = Ystart;
         }
 
-        printf("drawing %c\n", *pString);
         this->draw_char(Xpoint, Ypoint, *pString, Font, Color_Background, Color_Foreground);
 
         // The next character of the address

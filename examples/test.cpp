@@ -25,40 +25,33 @@
 
     // imgbuf[0] = 0xf0u;
 
-    display.init();
     display.clear();
 
-    // paint.create_image(
-    //     imgbuf, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0,
-    //     eImageColors::WHITE);
-    // paint.select_image(imgbuf);
+    paint.create_image(
+        imgbuf, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0, eImageColors::WHITE);
+    paint.select_image(imgbuf);
 
-    // sleep_ms(500);
-    // paint.clear_color(pico_oled::paint::eImageColors::BLACK);
-    // paint.draw_en_string(10,
-    //                      0,
-    //                      "Hello there",
-    //                      pico_oled::font::Font24,
-    //                      pico_oled::paint::eImageColors::WHITE,
-    //                      pico_oled::paint::eImageColors::BLACK);
+    sleep_ms(500);
+    paint.clear_color(pico_oled::paint::eImageColors::BLACK);
+    paint.draw_en_string(10,
+                         0,
+                         "Hello there",
+                         pico_oled::font::Font24,
+                         pico_oled::paint::eImageColors::WHITE,
+                         pico_oled::paint::eImageColors::BLACK);
 
     // 3.Show image on page1
-    // display.show(imgbuf);
-    display.show(gImage_1inch3_C_1.data());
+    display.show(imgbuf);
+    // display.show(gImage_1inch3_C_1.data());
 
     sleep_ms(1000);
 
-    // paint.clear_color(pico_oled::paint::eImageColors::BLACK);
-    // printf("0: %d\n", img->at(0));
+    paint.clear_color(pico_oled::paint::eImageColors::BLACK);
 
-    while (1)
-        ;
-
-#if 0
     printf("Paint_NewImage\r\n");
     // Paint_NewImage(BlackImage, OLED_1in3_C_WIDTH, OLED_1in3_C_HEIGHT, 0, WHITE);
     paint.create_image(
-        img, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0, eImageColors::WHITE);
+        imgbuf, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0, eImageColors::WHITE);
 
     printf("Drawing\r\n");
     // 1.Select Image
@@ -120,10 +113,10 @@
                          eDotSize::DOT_PIXEL_1X1,
                          eDrawFilling::DRAW_FILL_FULL);
 
-    img->at(0) = 0xf0u;
+    imgbuf[0] = 0xf0;
 
     // 3.Show image on page1
-    display.show(img);
+    display.show(imgbuf);
 
     sleep_ms(2000);
     paint.clear_color(eImageColors::BLACK);
@@ -135,15 +128,18 @@
         10, 30, 123.1, pico_oled::font::Font8, 2, eImageColors::WHITE, eImageColors::WHITE);
     paint.draw_number(
         10, 43, 987654.2, pico_oled::font::Font12, 2, eImageColors::WHITE, eImageColors::WHITE);
-    display.show(img);
+    display.show(imgbuf);
     sleep_ms(2000);
     paint.clear_color(eImageColors::BLACK);
 
     // display.show(gImage_1inch3_C_1);
     // sleep_ms(5000);
 
-    paint.create_image(
-        img, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_180, eImageColors::WHITE);
+    paint.create_image(imgbuf,
+                       pico_oled::k_width,
+                       pico_oled::k_height,
+                       eRotation::eROTATE_180,
+                       eImageColors::WHITE);
     paint.clear_color(eImageColors::BLACK);
 
     constexpr int key0 = 15;
@@ -193,11 +189,10 @@
         }
 
         if (key) {
-            display.show(img);
+            display.show(imgbuf);
             paint.clear_color(pico_oled::paint::eImageColors::BLACK);
         }
     }
-#endif
 }
 
 auto init_hw() {
