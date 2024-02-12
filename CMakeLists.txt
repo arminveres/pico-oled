@@ -61,7 +61,7 @@ target_link_libraries(pico-oled-paint PUBLIC
     pico_stdlib
     hardware_spi
     hardware_i2c
-    hardware_adc
+    # hardware_adc
 )
 
 add_executable(test
@@ -75,7 +75,7 @@ target_link_libraries(test PUBLIC
     pico_stdlib
     hardware_spi
     hardware_i2c
-    hardware_adc
+    # hardware_adc
 )
 
 
