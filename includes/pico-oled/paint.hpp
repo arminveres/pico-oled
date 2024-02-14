@@ -1,6 +1,7 @@
 #ifndef __PICO_OLED_PAINT_HPP
 #define __PICO_OLED_PAINT_HPP
 
+#include "display.hpp"
 #include "fonts.hpp"
 #include "paint_enums.hpp"
 #include "types.hpp"
@@ -23,7 +24,8 @@ struct PaintTime {
 ///
 /// Holds an image that is drawn upon
 struct Paint {
-    u8 *m_image_buf;
+   private:
+    ImBuf m_image_buf;
     u16 m_width;
     u16 m_height;
     u16 m_width_memory;
@@ -35,6 +37,7 @@ struct Paint {
     u16 m_height_byte;
     eScaling m_scale;
 
+   public:
     /// Init and create new image
     ///
     /// @param:
@@ -42,11 +45,12 @@ struct Paint {
     ///     width   :   The width of the picture
     ///     Height  :   The height of the picture
     ///     Color   :   Whether the picture is inverted
-    auto create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color)
-        -> void;
+    auto create_image(u16 Width, u16 Height, eRotation rotation, eImageColors Color) -> void;
 
     /// Select Image
-    auto select_image(u8 *image) -> void;
+    auto select_image(ImBuf image) -> void;
+
+    auto get_image() const -> const ImBuf &;
 
     auto set_rotation(const eRotation rotation) -> void;
 
@@ -190,11 +194,8 @@ struct Paint {
     auto draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W_Image, u16 H_Image)
         -> void;
 
-    auto bmp_windows(unsigned char x,
-                     unsigned char y,
-                     const unsigned char *pBmp,
-                     unsigned char chWidth,
-                     unsigned char chHeight) -> void;
+    auto bmp_windows(const u8 x, const u8 y, const u8 *pBmp, const u8 chWidth, const u8 chHeight)
+        -> void;
 };
 }  // namespace pico_oled::paint
 #endif

@@ -35,6 +35,7 @@
 #include <hardware/spi.h>
 #include <pico/time.h>
 
+#include <array>
 #include <cstdio>
 
 #include "types.hpp"
@@ -60,9 +61,11 @@ static constexpr auto EPD_SCL_PIN = 5;
 
 namespace pico_oled {
 
-constexpr u8 k_width = 128;
-constexpr u8 k_height = 64;
-constexpr u32 k_imsize = k_width * k_height / 8;
+static constexpr u8 k_width = 128;
+static constexpr u8 k_height = 64;
+static constexpr u32 k_imsize = k_width * k_height / 8;
+
+using ImBuf = std::array<u8, k_imsize>;
 
 enum class eConType { I2C, SPI };
 
@@ -116,7 +119,7 @@ struct Display {
         static constexpr auto NOP = 0xE3;
     };
 
-    auto show(const u8 *imbuf) const {
+    auto show(const ImBuf &imbuf) const {
         constexpr auto l_width = k_width / 8;
         // write starting row
         write_to_reg(0xB0u);

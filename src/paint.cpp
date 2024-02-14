@@ -5,15 +5,15 @@
 #include <limits>
 
 #include "Debug.hpp"
+#include "display.hpp"
 #include "fonts.hpp"
 #include "paint_enums.hpp"
 #include "types.hpp"
 
 using namespace pico_oled::paint;
 
-auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, eImageColors Color)
-    -> void {
-    this->m_image_buf = image;
+auto Paint::create_image(u16 Width, u16 Height, eRotation rotation, eImageColors Color) -> void {
+    this->m_image_buf = {};
 
     this->m_width_memory = Width;
     this->m_height_memory = Height;
@@ -41,13 +41,12 @@ auto Paint::create_image(u8 *image, u16 Width, u16 Height, eRotation rotation, e
     }
 }
 
-auto Paint::select_image(u8 *image) -> void { this->m_image_buf = image; }
+auto Paint::select_image(pico_oled::ImBuf image) -> void { this->m_image_buf = image; }
 
+auto Paint::get_image() const -> const ImBuf & { return this->m_image_buf; }
 auto Paint::set_rotation(const eRotation rotation) -> void { this->m_rotation = rotation; }
 
-auto Paint::set_mirror_orientation(eMirrorOrientiation mirror) -> void {
-    this->m_mirror = mirror;
-}
+auto Paint::set_mirror_orientation(eMirrorOrientiation mirror) -> void { this->m_mirror = mirror; }
 
 auto Paint::set_scale(eScaling scale) -> void {
     this->m_scale = scale;
@@ -612,8 +611,7 @@ auto Paint::draw_time(u16 Xstart,
         Xstart + Dx * 6, Ystart, value[pTime.Sec % 10], Font, Color_Background, Color_Foreground);
 }
 
-auto Paint::draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W_Image, u16 H_Image)
-    -> void {
+auto Paint::draw_image(const u8 *image, u16 xStart, u16 yStart, u16 W_Image, u16 H_Image) -> void {
     for (i32 j = 0; j < H_Image; j++) {
         for (i32 i = 0; i < W_Image; i++) {
             if (xStart + i < this->m_width_memory &&
@@ -629,30 +627,27 @@ auto Paint::draw_image(const unsigned char *image, u16 xStart, u16 yStart, u16 W
     }
 }
 
-auto Paint::draw_bitmap(const unsigned char *image_buffer) -> void {
+auto Paint::draw_bitmap(const u8 *image_buffer) -> void {
     for (u16 y = 0; y < this->m_height_byte; y++) {
         for (u16 x = 0; x < this->m_width_byte; x++) {  // 8 pixel =  1 byte
             const u32 Addr = x + y * this->m_width_byte;
-            this->m_image_buf[Addr] = (unsigned char)image_buffer[Addr];
+            this->m_image_buf[Addr] = static_cast<u8>(image_buffer[Addr]);
         }
     }
 }
 
-auto Paint::draw_bitmap_block(const unsigned char *image_buffer, u8 Region) -> void {
+auto Paint::draw_bitmap_block(const u8 *image_buffer, u8 Region) -> void {
     for (u16 y = 0; y < this->m_height_byte; y++) {
         for (u16 x = 0; x < this->m_width_byte; x++) {  // 8 pixel =  1 byte
             const u32 Addr = x + y * this->m_width_byte;
-            this->m_image_buf[Addr] = (unsigned char)
-                image_buffer[Addr + (this->m_height_byte) * this->m_width_byte * (Region - 1)];
+            this->m_image_buf[Addr] = static_cast<u8>(
+                image_buffer[Addr + (this->m_height_byte) * this->m_width_byte * (Region - 1)]);
         }
     }
 }
 
-auto Paint::bmp_windows(const unsigned char x,
-                        const unsigned char y,
-                        const unsigned char *pBmp,
-                        const unsigned char chWidth,
-                        const unsigned char chHeight) -> void {
+auto Paint::bmp_windows(const u8 x, const u8 y, const u8 *pBmp, const u8 chWidth, const u8 chHeight)
+    -> void {
     const u16 byteWidth = (chWidth + 7) / 8;
 
     for (u16 j = 0; j < chHeight; j++) {

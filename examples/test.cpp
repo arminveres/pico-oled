@@ -21,18 +21,14 @@
     pico_oled::Display<pico_oled::eConType::SPI> display;
     Paint paint;
 
-    u8 imgbuf[pico_oled::k_imsize];
-    // u8 *imgbuf = new u8[pico_oled::k_imsize];
-    // std::array<u8, display.k_imsize> img;
-    // auto img = std::make_shared<std::array<u8, pico_oled::k_imsize>>();
 
     // imgbuf[0] = 0xf0u;
 
     display.clear();
 
     paint.create_image(
-        imgbuf, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0, eImageColors::WHITE);
-    paint.select_image(imgbuf);
+        pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0, eImageColors::WHITE);
+    // paint.select_image(imgbuf);
 
     sleep_ms(500);
     paint.clear_color(pico_oled::paint::eImageColors::BLACK);
@@ -44,7 +40,7 @@
                          pico_oled::paint::eImageColors::BLACK);
 
     // 3.Show image on page1
-    display.show(imgbuf);
+    display.show(paint.get_image());
     // display.show(gImage_1inch3_C_1.data());
 
     sleep_ms(1000);
@@ -54,7 +50,7 @@
     printf("Paint_NewImage\r\n");
     // Paint_NewImage(BlackImage, OLED_1in3_C_WIDTH, OLED_1in3_C_HEIGHT, 0, WHITE);
     paint.create_image(
-        imgbuf, pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0, eImageColors::WHITE);
+        pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_0, eImageColors::WHITE);
 
     printf("Drawing\r\n");
     // 1.Select Image
@@ -116,10 +112,10 @@
                          eDotSize::DOT_PIXEL_1X1,
                          eDrawFilling::DRAW_FILL_FULL);
 
-    imgbuf[0] = 0xf0;
+    // imgbuf[0] = 0xf0;
 
     // 3.Show image on page1
-    display.show(imgbuf);
+    display.show(paint.get_image());
 
     sleep_ms(2000);
     paint.clear_color(eImageColors::BLACK);
@@ -131,18 +127,15 @@
         10, 30, 123.1, pico_oled::font::Font8, 2, eImageColors::WHITE, eImageColors::WHITE);
     paint.draw_number(
         10, 43, 987654.2, pico_oled::font::Font12, 2, eImageColors::WHITE, eImageColors::WHITE);
-    display.show(imgbuf);
+    display.show(paint.get_image());
     sleep_ms(2000);
     paint.clear_color(eImageColors::BLACK);
 
     // display.show(gImage_1inch3_C_1);
     // sleep_ms(5000);
 
-    paint.create_image(imgbuf,
-                       pico_oled::k_width,
-                       pico_oled::k_height,
-                       eRotation::eROTATE_180,
-                       eImageColors::WHITE);
+    paint.create_image(
+        pico_oled::k_width, pico_oled::k_height, eRotation::eROTATE_180, eImageColors::WHITE);
     paint.clear_color(eImageColors::BLACK);
 
     constexpr int key0 = 15;
@@ -192,7 +185,7 @@
         }
 
         if (key) {
-            display.show(imgbuf);
+            display.show(paint.get_image());
             paint.clear_color(pico_oled::paint::eImageColors::BLACK);
         }
     }
