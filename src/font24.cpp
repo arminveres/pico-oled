@@ -33,12 +33,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************
+ * @author      Armin Veres (@arminveres)
+ * @date        11-February-2024
+ * @attention   Updated to cpp
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "fonts.h"
+#include "fonts.hpp"
 
-const uint8_t Font24_Table[] = {
+static constexpr uint8_t Font24_Table[] = {
     // @0 ' ' (17 pixels wide)
     0x00, 0x00, 0x00,  //
     0x00, 0x00, 0x00,  //
@@ -2510,9 +2513,12 @@ const uint8_t Font24_Table[] = {
     0x00, 0x00, 0x00,  //
 };
 
-sFONT Font24 = {
-    Font24_Table, 17, /* Width */
-    24,               /* Height */
+namespace pico_oled::font {
+pico_oled::font::Font Font24 = {
+    Font24_Table,
+    17,
+    24,
 };
+}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

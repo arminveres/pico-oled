@@ -34,59 +34,36 @@
  *POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************
+ * @author      Armin Veres (@arminveres)
+ * @date        11-February-2024
+ * @attention   Updated to cpp
  */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __FONTS_H
-#define __FONTS_H
+#ifndef __PICO_OLED_FONTS_HPP
+#define __PICO_OLED_FONTS_HPP
 
-/*×î´ó×ÖÌåÎ¢ÈíÑÅºÚ24 (32x41) */
-#define MAX_HEIGHT_FONT 41
-#define MAX_WIDTH_FONT 32
+#include "types.hpp"
+
+namespace pico_oled::font {
+
 #define OFFSET_BITMAP
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* Includes ------------------------------------------------------------------*/
-#include <stdint.h>
+constexpr auto MAX_HEIGHT_FONT = 41;
+constexpr auto MAX_WIDTH_FONT = 32;
 
 // ASCII
-typedef struct _tFont {
-  const uint8_t *table;
-  uint16_t Width;
-  uint16_t Height;
+struct Font {
+    const u8 *table;
+    u16 Width;
+    u16 Height;
+};
 
-} sFONT;
+extern Font Font24;
+extern Font Font20;
+extern Font Font16;
+extern Font Font12;
+extern Font Font8;
 
-// GB2312
-typedef struct // ºº×Ö×ÖÄ£Êý¾Ý½á¹¹
-{
-  const char index[2]; // ºº×ÖÄÚÂëË÷Òý
-  const char matrix[MAX_HEIGHT_FONT * MAX_WIDTH_FONT / 8 + 2]; // µãÕóÂëÊý¾Ý
-} CH_CN;
-
-typedef struct {
-  const CH_CN *table;
-  uint16_t size;
-  uint16_t ASCII_Width;
-  uint16_t Width;
-  uint16_t Height;
-
-} cFONT;
-
-extern sFONT Font24;
-extern sFONT Font20;
-extern sFONT Font16;
-extern sFONT Font12;
-extern sFONT Font8;
-
-extern cFONT Font12CN;
-extern cFONT Font24CN;
-#ifdef __cplusplus
-}
-#endif
+}  // namespace pico_oled::font
 
 #endif /* __FONTS_H */
 

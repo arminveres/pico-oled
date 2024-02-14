@@ -33,16 +33,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************
+ * @author      Armin Veres (@arminveres)
+ * @date        11-February-2024
+ * @attention   Updated to cpp
  */
 
-/* Includes ------------------------------------------------------------------*/
-#include "fonts.h"
+#include "fonts.hpp"
 
-//
-//  Font data for Courier New 12pt
-//
-
-const uint8_t Font12_Table[] = {
+static constexpr uint8_t Font12_Table[] = {
     // @0 ' ' (7 pixels wide)
     0x00,  //
     0x00,  //
@@ -1374,9 +1372,12 @@ const uint8_t Font12_Table[] = {
     0x00,  //
 };
 
-sFONT Font12 = {
-    Font12_Table, 7, /* Width */
-    12,              /* Height */
+namespace pico_oled::font {
+Font Font12 = {
+    Font12_Table,
+    7,
+    12,
 };
+}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
