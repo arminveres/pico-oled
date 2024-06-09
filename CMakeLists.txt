@@ -5,11 +5,7 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 
 include(cmake/pico_sdk_import.cmake)
-project(pico-oled
-    C
-    CXX
-    ASM
-)
+project(pico-oled C CXX ASM)
 
 set(PICO_TOOLCHAIN_PATH /opt/gcc-arm-none-eabi/bin)
 set(PICO_BOARD pico_w)
@@ -43,7 +39,7 @@ add_link_options(
 )
 
 
-add_library(pico-oled-fonts
+add_library(pico-oled-fonts STATIC
     src/font12.cpp
     src/font16.cpp
     src/font20.cpp
@@ -51,7 +47,11 @@ add_library(pico-oled-fonts
     src/font8.cpp
 )
 
-add_library(pico-oled-paint
+target_include_directories(pico-oled-fonts PUBLIC
+    includes
+)
+
+add_library(pico-oled-paint STATIC
     src/paint.cpp
 )
 
@@ -62,6 +62,10 @@ target_link_libraries(pico-oled-paint PUBLIC
     hardware_spi
     hardware_i2c
     # hardware_adc
+)
+
+target_include_directories(pico-oled-paint PUBLIC
+    includes
 )
 
 add_executable(test
