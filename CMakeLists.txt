@@ -4,7 +4,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 
-include(cmake/pico_sdk_import.cmake)
+# include(cmake/pico_sdk_import.cmake)
+include(../ael-cpp/external/pico-sdk/pico_sdk_init.cmake)
 project(pico-oled C CXX ASM)
 
 set(PICO_TOOLCHAIN_PATH /opt/gcc-arm-none-eabi/bin)

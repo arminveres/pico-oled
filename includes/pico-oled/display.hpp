@@ -40,14 +40,19 @@
 
 #include "types.hpp"
 
-volatile static const auto SPI_PORT = spi1;
+volatile static const auto SPI_PORT = spi0;
 
-static constexpr auto EPD_DC_PIN = 8;
-static constexpr auto EPD_CS_PIN = 9;
-static constexpr auto EPD_CLK_PIN = 10;
-static constexpr auto EPD_MOSI_PIN = 11;
-static constexpr auto EPD_RST_PIN = 12;
-static constexpr auto EPD_BL_PIN = 13;
+// static constexpr auto EPD_DC_PIN = 8;
+static constexpr auto EPD_DC_PIN = 16;
+// static constexpr auto EPD_CS_PIN = 9;
+static constexpr auto EPD_CS_PIN = 1;
+// static constexpr auto EPD_CLK_PIN = 10;
+static constexpr auto EPD_CLK_PIN = 18;
+// static constexpr auto EPD_MOSI_PIN = 11;
+static constexpr auto EPD_MOSI_PIN = 19;
+// static constexpr auto EPD_RST_PIN = 12;
+static constexpr auto EPD_RST_PIN = 13;
+// static constexpr auto EPD_BL_PIN = 14;
 
 static constexpr auto IIC_CMD = 0x00;
 static constexpr auto IIC_RAM = 0x40;
@@ -137,7 +142,7 @@ struct Display {
         }
     }
 
-    auto clear() const {
+    auto clear() -> Display& {
         constexpr auto l_width = k_width / 8;
         // write starting row
         write_to_reg(0xB0u);
@@ -149,6 +154,7 @@ struct Display {
                 write_data(0x00u);
             }
         }
+        return *this;
     }
 
     auto reset() const {
