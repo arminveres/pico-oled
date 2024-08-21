@@ -158,7 +158,7 @@ struct Paint {
     ///     Color_Background : Select the background color,
     auto draw_number(u16 Xpoint,
                      u16 Ypoint,
-                     double Nummber,
+                     float Nummber,
                      const font::Font &Font,
                      u16 Digit,
                      eImageColors Color_Foreground,

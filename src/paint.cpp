@@ -519,17 +519,14 @@ auto Paint::draw_en_string(u16 Xstart,
     }
 }
 
-auto Paint::draw_number(u16 Xpoint,
-                        u16 Ypoint,
-                        double Nummber,
-                        const font::Font &Font,
-                        u16 Digit,
-                        eImageColors Color_Foreground,
-                        eImageColors Color_Background) -> void {
-    i16 Num_Bit = 0;
-    i16 Str_Bit = 0;
-    i32 temp = Nummber;
+auto Paint::draw_number(u16 Xpoint, u16 Ypoint, float Number, const font::Font &Font, u16 precision,
+                        eImageColors Color_Foreground, eImageColors Color_Background) -> void {
+    u16 Num_Bit = 0;
+    u16 Str_Bit = 0;
+    i32 int_part = static_cast<i32>(Number);                  // Integer part of the number
+    float frac_part = Number - static_cast<float>(int_part);  // Fractional part of the number
 
+    // Hold the final string to be shown on display.
     std::array<char, std::numeric_limits<char>::max()> string_arr = {0};
     std::array<u8, std::numeric_limits<u8>::max()> number_arr = {0};
 
@@ -538,41 +535,45 @@ auto Paint::draw_number(u16 Xpoint,
         return;
     }
 
-    if (Digit > 0) {
-        float decimals = Nummber - temp;
-        for (u8 i = Digit; i > 0; i--) {
-            decimals *= 10;
-        }
-        temp = decimals;
-        // Converts a number to a string
-        for (u8 i = Digit; i > 0; i--) {
-            number_arr[Num_Bit] = temp % 10 + '0';
-            Num_Bit++;
-            temp /= 10;
-        }
-        number_arr[Num_Bit] = '.';
-        Num_Bit++;
+    if (Number < 0) {  // Handle negative numbers
+        string_arr[Str_Bit++] = '-';
+        int_part = -int_part;
+        frac_part = -frac_part;
+    } else if (Number == 0) {  // Zeroes are not handled below, so add it manually
+        string_arr[0] = '0';
     }
 
-    temp = Nummber;
+    // Handle digits after the decimal point
+    if (precision > 0) {
+        // shift the fractional parts as many times as necessary
+        for (u8 i = 0; i < precision; i++) {
+            frac_part *= 10;
+        }
+        auto frac_int = static_cast<u32>(frac_part);
 
-    // Converts a number to a string
-    while (temp) {
-        number_arr[Num_Bit] = temp % 10 + '0';
-        Num_Bit++;
-        temp /= 10;
+        // Converts the fractional part to a string
+        for (u8 i = 0; i < precision; i++) {
+            number_arr[Num_Bit++] = frac_int % 10 + '0';
+            frac_int /= 10;
+        }
+
+        number_arr[Num_Bit++] = '.';
     }
 
-    // The string is inverted
+    // Converts the integer part to a string
+    while (int_part) {
+        number_arr[Num_Bit++] = static_cast<u32>(int_part) % 10 + '0';
+        int_part /= 10;
+    }
+
+    // Invert the string (both integer and fractional parts)
     while (Num_Bit > 0) {
-        string_arr[Str_Bit] = number_arr[Num_Bit - 1];
-        Str_Bit++;
-        Num_Bit--;
+        string_arr[Str_Bit++] = number_arr[--Num_Bit];
     }
 
-    // show
-    this->draw_en_string(
-        Xpoint, Ypoint, string_arr.data(), Font, Color_Background, Color_Foreground);
+    // Display the string
+    this->draw_en_string(Xpoint, Ypoint, string_arr.data(), Font, Color_Background,
+                         Color_Foreground);
 }
 
 auto Paint::draw_time(u16 Xstart,
